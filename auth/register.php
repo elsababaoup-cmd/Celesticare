@@ -1,77 +1,67 @@
 <?php
-session_start();
-include __DIR__ . "/../config/dbconfig.php";
+include("../config/dbconfig.php");
 
-$errors = [];
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $email    = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $password2 = $_POST['password2'] ?? '';
-    $zodiac   = trim($_POST['zodiac'] ?? null);
+$message = "";
 
-    // basic validation
-    if ($username === '' || strlen($username) < 3) $errors[] = "Enter a username (min 3 chars).";
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Enter a valid email.";
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if ($username === '' || strlen($username) < 3) $errors[] = "Enter a username (min 3 chars).";
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Enter a valid email.";
-    
-        if ($password === '' || $password2 === '') {
-            $errors[] = "Enter both password fields.";
-        } elseif (strlen($password) < 6) {
-            $errors[] = "Password must be at least 6 chars.";
-        } elseif ($password !== $password2) {
-            $errors[] = "Passwords do not match.";
-        }
-    }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
 
-    if (empty($errors)) {
-        // check duplicate
-        $sql = "SELECT id FROM users WHERE username = ? OR email = ? LIMIT 1";
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ss", $username, $email);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_store_result($stmt);
+    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+        $message = "<div class='alert alert-danger'>All fields are required.</div>";
+    } elseif ($password !== $confirm_password) {
+        $message = "<div class='alert alert-danger'>Passwords do not match!</div>";
+    } else {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        if (mysqli_stmt_num_rows($stmt) > 0) {
-            $errors[] = "Username or email already taken.";
-            mysqli_stmt_close($stmt);
+        $query = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
+        if (mysqli_query($conn, $query)) {
+            header("Location: login.php?registered=1");
+            exit();
         } else {
-            mysqli_stmt_close($stmt);
-            // insert
-            $pw_hash = password_hash($password, PASSWORD_DEFAULT);
-            $insert = "INSERT INTO users (username, email, password, zodiac_sign) VALUES (?, ?, ?, ?)";
-            $ins = mysqli_prepare($conn, $insert);
-            mysqli_stmt_bind_param($ins, "ssss", $username, $email, $pw_hash, $zodiac);
-            if (mysqli_stmt_execute($ins)) {
-                mysqli_stmt_close($ins);
-                header("Location: login.php?registered=1");
-                exit;
-            } else {
-                $errors[] = "Database error: could not create account.";
-                mysqli_stmt_close($ins);
-            }
+            $message = "<div class='alert alert-danger'>Error: " . mysqli_error($conn) . "</div>";
         }
     }
 }
 ?>
-<!doctype html>
-<html><head><meta charset="utf-8"><title>Register</title></head>
-<body>
-  <h2>Register</h2>
-  <?php if (!empty($errors)): ?>
-    <div style="color:#900;">
-      <ul><?php foreach($errors as $e) echo "<li>".htmlspecialchars($e)."</li>"; ?></ul>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - CelestiCare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card p-4 shadow-sm">
+        <h2 class="mb-3">Register</h2>
+        <?php if (!empty($message)) echo $message; ?>
+        <form method="POST" action="">
+            <div class="mb-3">
+                <label>Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+            <a href="login.php" class="btn btn-link">Already have an account?</a>
+        </form>
     </div>
-  <?php endif; ?>
-  <form method="post" action="">
-    <label>Username<br><input name="username" required></label><br>
-    <label>Email<br><input name="email" type="email" required></label><br>
-    <label>Zodiac (optional)<br><input name="zodiac"></label><br>
-    <label>Password<br><input name="password" type="password" required></label><br>
-    <label>Confirm Password<br><input name="password2" type="password" required></label><br>
-    <button type="submit">Register</button>
-  </form>
-  <p><a href="login.php">Already have an account? Login</a></p>
-</body></html>
+</div>
+
+</body>
+</html>

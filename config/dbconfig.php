@@ -1,13 +1,13 @@
 <?php
 $host = "localhost";
-$user = "root";         // your XAMPP MySQL username
-$pass = "";             // your XAMPP MySQL password
-$dbname = "celesticare"; // your database name
+$user = "root";
+$pass = "";
+$dbname = "celesticare";
 
-// Create connection
+// connection
 $conn = mysqli_connect($host, $user, $pass, $dbname);
 
-// Check connection
+// Check
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }

@@ -1,13 +1,6 @@
 <?php
-session_start(); // start session
-
-// Unset all session variables
-$_SESSION = [];
-
-// Destroy the session
+session_start();
+session_unset();
 session_destroy();
-
-// Redirect back to login page
-header("Location: login.php");
+header("Location: login.php?loggedout=1");
 exit();
-?>

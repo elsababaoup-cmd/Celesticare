@@ -1,28 +1,26 @@
-# Ignore system files
+# system files
 .DS_Store
 Thumbs.db
 ehthumbs.db
 desktop.ini
 
-# Ignore Windows junk
+# Windows junk
 /AppData/
 /*.lnk
 
-# Ignore XAMPP logs/cache
+# XAMPP logs/cache
 /tmp/
 /logs/
 /*.log
 
-# Ignore PHP session files
+# PHP files
 *.sess
 
-# Ignore IDE/editor settings
+# IDE settings
 .vscode/
 .idea/
 
-# Ignore vendor or node_modules if you ever use them
 vendor/
 node_modules/
 
-# Ignore environment/config secrets
 .env
