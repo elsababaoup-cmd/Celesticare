@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 01, 2025 at 04:08 PM
+-- Generation Time: Oct 04, 2025 at 04:45 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,8 +29,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `username` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `zodiac_sign` varchar(20) DEFAULT NULL,
   `zodiac` varchar(20) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -39,12 +41,11 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `zodiac`, `created_at`) VALUES
-(1, 'Alice Johnson', 'alice@example.com', 'Cancer', '2025-10-01 13:28:39'),
-(2, 'Brian Smith', 'brian@example.com', 'Leo', '2025-10-01 13:28:39'),
-(3, 'Carla Reyes', 'carla@example.com', 'Pisces', '2025-10-01 13:28:39'),
-(4, 'Daniel Cruz', 'daniel@example.com', 'Virgo', '2025-10-01 13:28:39'),
-(5, 'Ella Santos', 'ella@example.com', 'Scorpio', '2025-10-01 13:28:39');
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `zodiac_sign`, `zodiac`, `created_at`) VALUES
+(8, 'tsukunekun12', 'screwball362@gmail.com', '$2y$10$DnwXQ85LE24UpMKNfdChcOfiVFZD6uhH.TcDNylaRgwVieXICuWIu', NULL, NULL, '2025-10-03 15:38:10'),
+(10, '233', 'jhenmendoza18@gmail.com', '$2y$10$u8O84a.y3sAL0/LzSuZh6e2ze9WbxRVDRihiIa/BpvG5YiXCfaj2q', '2323', NULL, '2025-10-03 15:47:49'),
+(11, 'tsukunekun12666', 'deguzmanjhen748@gmail.com', '$2y$10$3HE.KEDlMbMIvYuVMEzeY.SfnvYAYUADaT0t9vW52Deol6nIP2SI.', 'cancaer', NULL, '2025-10-03 15:49:53'),
+(13, 'e', 'elleskyebabao362@gmail.com', '$2y$10$xA.wQwshvcdn01J1IkJWmucm9EEmaplPu3p6TqvuqgeAcv6gGNsA6', NULL, NULL, '2025-10-04 01:58:51');
 
 --
 -- Indexes for dumped tables
@@ -54,7 +55,9 @@ INSERT INTO `users` (`id`, `name`, `email`, `zodiac`, `created_at`) VALUES
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `email_2` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -64,7 +67,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
