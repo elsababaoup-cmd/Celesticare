@@ -113,8 +113,11 @@ $wheelImage = $wheelImages[$undertone] ?? "assets/neutral_wheel.png";
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
-    background: #f8f8f8;
+    background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
     padding-top: 80px; /* navbar height */
+    overflow-y: auto; /* enable scrolling */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
 }
 .navbar {
     position: fixed;
@@ -198,6 +201,140 @@ h2 {
     margin-top: 10px;
     line-height: 1.5;
 }
+.info-box {
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #333;
+}
+.modal-content {
+    background-color: #121212;
+    color: #fff;
+    border-radius: 20px;
+    border: none;
+}
+.modal-header { 
+    border-bottom: none; 
+}
+.form-control { 
+  background-color: #1f1f1f; color: #fff; border: none;
+}
+.form-control:focus { 
+  background-color: #2b2b2b; color: #fff; box-shadow: none;
+}
+.btn-dark { 
+  border-radius: 10px; 
+}
+#message { 
+  margin-top: 10px; 
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.login-box, .register-box {
+  background-color: #2e2e2e;
+  color: #ffffff;
+  padding: 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-box h2, .register-box h2 {
+  font-size: 20px;
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+.form-control {
+  background-color: #4b4b4b;
+  border: none;
+  color: #fff;
+  border-radius: 30px;
+  padding: 12px 20px;
+}
+
+.form-control::placeholder {
+  color: #cfcfcf;
+}
+
+.btn-login, .btn-register {
+  background-color: #6b5b95;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 20px;
+  width: 100%;
+  transition: 0.3s;
+}
+
+.btn-login:hover, .btn-register:hover {
+  background-color: #8c77c5;
+}
+
+.brand-title {
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.text-muted {
+  color: #cfcfcf !important;
+}
+
+.text-muted a {
+  color: #fff !important;
+  text-decoration: underline;
+}
+
+.text-muted a:hover {
+  color: #d3bfff !important;
+}
+
+
+/* --- Fix modal centering --- */
+.modal-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* forces perfect vertical center */
+  margin: 0 auto;
+}
+
+/* Remove extra Bootstrap translate offset */
+.modal.fade .modal-dialog {
+  transform: translate(0, 0) !important;
+  transition: transform 0.3s ease-out;
+}
+
+
+/* Adjust for any vertical offset (optional tweak) */
+.modal-content {
+  margin: 0 auto;
+  top: 0;
+  bottom: 0;
+}
+
+/* Prevent scrollbars from appearing during modal display */
+body.modal-open {
+  overflow: hidden !important;
+  padding-right: 0 !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent;
+}
+
 </style>
 </head>
 <body>
@@ -207,8 +344,10 @@ h2 {
 
     <div class="result-section">
         <div class="image-box">
-            <!-- Spinning wheel image -->
             <img src="<?= htmlspecialchars($wheelImage) ?>" alt="<?= htmlspecialchars($undertone) ?> Wheel" class="wheel" draggable="false" tabindex="0">
+            <div class="info-box">
+                <?= htmlspecialchars($zodiac) ?>’s undertone gives insight into the best colors for your style and wardrobe.
+            </div>
         </div>
 
         <div class="text-box">
@@ -221,11 +360,144 @@ h2 {
             </div>
 
             <p class="description"><?= htmlspecialchars($description) ?></p>
+
+            <div class="info-box">
+                These colors complement your undertone perfectly and can enhance your natural glow.
+            </div>
+            <div class="info-box">
+                Experiment with these shades in clothing, makeup, and accessories to find your signature look.
+            </div>
         </div>
     </div>
+
+    <!-- Continue Button -->
+    <<button type="button" class="btn btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">
+  Continue
+</button>
+
+<!-- LOGIN MODAL -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content login-box">
+      <div class="brand-title">CELESTICARE</div>
+      <h2>Log in to your CelestiCare profile</h2>
+
+      <form method="POST" action="../auth/login_process.php">
+        <div class="mb-3">
+          <input type="email" name="email" class="form-control" placeholder="Email" required>
+        </div>
+        <div class="mb-3">
+          <input type="password" name="password" class="form-control" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-login">Login</button>
+
+        <p class="text-center text-muted mt-3">
+          Don’t have a CelestiCare profile?
+          <a href="#" id="showRegister">Sign up</a>
+        </p>
+      </form>
+    </div>
+  </div>
 </div>
 
+<!-- REGISTER MODAL -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content register-box">
+      <div class="brand-title">CELESTICARE</div>
+      <h2>Sign up to create your CelestiCare Profile!</h2>
+
+      <form method="POST" action="../auth/register_process.php">
+        <div class="mb-3">
+          <input type="email" name="email" class="form-control" placeholder="Email" required>
+        </div>
+        <div class="mb-3">
+          <input type="text" name="username" class="form-control" placeholder="Username" required>
+        </div>
+        <div class="mb-3">
+          <input type="password" name="password" class="form-control" placeholder="Password" required>
+        </div>
+        <div class="mb-3">
+          <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password" required>
+        </div>
+        <button type="submit" class="btn btn-register">Continue</button>
+
+        <p class="text-center text-muted mt-3">
+          Already have an account? <a href="#" id="showLogin">Login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
+// Toggle Login/Register sections
+$("#showRegister").click(function(e){
+  e.preventDefault();
+  $("#loginSection").hide();
+  $("#registerSection").show();
+});
+$("#showLogin").click(function(e){
+  e.preventDefault();
+  $("#registerSection").hide();
+  $("#loginSection").show();
+});
+
+// Login process
+$("#loginForm").submit(function(e){
+  e.preventDefault();
+  $.post("../auth/login_process.php", $(this).serialize(), function(data){
+    if(data.status === "success"){
+      $("#message").html('<span class="text-success">'+data.message+'</span>');
+      setTimeout(()=>window.location.href="../dashboard/index.php", 1000);
+    } else {
+      $("#message").html('<span class="text-danger">'+data.message+'</span>');
+    }
+  }, "json");
+});
+
+// Register process
+$("#registerForm").submit(function(e){
+  e.preventDefault();
+  $.post("../auth/register_process.php", $(this).serialize(), function(data){
+    if(data.status === "success"){
+      $("#registerMessage").html('<span class="text-success">'+data.message+'</span>');
+      setTimeout(()=>window.location.href="../dashboard/index.php", 1000);
+    } else {
+      $("#registerMessage").html('<span class="text-danger">'+data.message+'</span>');
+    }
+  }, "json");
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const showRegister = document.getElementById('showRegister');
+  const showLogin = document.getElementById('showLogin');
+  const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+  const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+
+  if (showRegister) {
+    showRegister.addEventListener('click', function(e) {
+      e.preventDefault();
+      loginModal.hide();
+      setTimeout(() => registerModal.show(), 400);
+    });
+  }
+
+  if (showLogin) {
+    showLogin.addEventListener('click', function(e) {
+      e.preventDefault();
+      registerModal.hide();
+      setTimeout(() => loginModal.show(), 400);
+    });
+  }
+});
+
+// WHEEL FUNCTIONALITY
 (function(){
   const wheel = document.querySelector('.wheel');
   if (!wheel) return;
@@ -238,6 +510,7 @@ h2 {
   let angle = 0;
   let running = false;
 
+  // Spin animation frame
   function step(now){
     if (!running) { rafId = null; return; }
     if (!lastTime) lastTime = now;
@@ -248,6 +521,7 @@ h2 {
     rafId = requestAnimationFrame(step);
   }
 
+  // Start rotation
   function start(){
     if (running) return;
     running = true;
@@ -255,6 +529,7 @@ h2 {
     rafId = requestAnimationFrame(step);
   }
 
+  // Stop rotation
   function stop(){
     if (!running) return;
     running = false;
@@ -264,11 +539,26 @@ h2 {
     wheel.style.transform = `rotate(${angle}deg)`;
   }
 
+  // Hover spin
   wheel.addEventListener('mouseenter', start);
   wheel.addEventListener('mouseleave', stop);
-  wheel.addEventListener('focus', start);
-  wheel.addEventListener('blur', stop);
+
+  // Prevent dragging
   wheel.addEventListener('dragstart', e => e.preventDefault());
+
+  // Optional click-to-spin button
+  const spinButton = document.querySelector('#spinButton');
+  if (spinButton) {
+    spinButton.addEventListener('click', function(){
+      if (!running) {
+        start();
+        spinButton.textContent = "Stop Wheel";
+      } else {
+        stop();
+        spinButton.textContent = "Spin Wheel";
+      }
+    });
+  }
 })();
 </script>
 
