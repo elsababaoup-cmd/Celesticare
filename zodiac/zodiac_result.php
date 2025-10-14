@@ -1,75 +1,65 @@
 <?php
 session_start();
 
-// Handle form submission first
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $birthdate = $_POST["birthdate"] ?? '';
-    $month = date("n", strtotime($birthdate));
-    $day = date("j", strtotime($birthdate));
+// Zodiac traits
+$traits = [
+    "Aries" => "The Bold",
+    "Taurus" => "The Grounded",
+    "Gemini" => "The Curious",
+    "Cancer" => "The Nurturer",
+    "Leo" => "The Radiant",
+    "Virgo" => "The Perfectionist",
+    "Libra" => "The Harmonizer",
+    "Scorpio" => "The Intense",
+    "Sagittarius" => "The Adventurer",
+    "Capricorn" => "The Ambitious",
+    "Aquarius" => "The Visionary",
+    "Pisces" => "The Whimsical"
+];
 
-    // Function to calculate zodiac
-    function getZodiacSign($month, $day) {
-        $zodiacs = [
-            ['Capricorn', 1, 19],
-            ['Aquarius', 2, 18],
-            ['Pisces', 3, 20],
-            ['Aries', 4, 19],
-            ['Taurus', 5, 20],
-            ['Gemini', 6, 20],
-            ['Cancer', 7, 22],
-            ['Leo', 8, 22],
-            ['Virgo', 9, 22],
-            ['Libra', 10, 22],
-            ['Scorpio', 11, 21],
-            ['Sagittarius', 12, 21],
-            ['Capricorn', 12, 31]
-        ];
+if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["birthdate"])) {
+    $birthdate = $_POST["birthdate"];
+    $timestamp = strtotime($birthdate);
+    if ($timestamp !== false) {
+        $month = (int)date("n", $timestamp);
+        $day = (int)date("j", $timestamp);
 
-        foreach ($zodiacs as $i => $zodiac) {
-            [$s, $zMonth, $zDay] = $zodiac;
-            if (($month == $zMonth && $day <= $zDay) || ($month == ($zMonth - 1) && $day > $zodiacs[$i - 1][2])) {
-                return $s;
-            }
+        function getZodiacSign($month, $day) {
+            if     (($month == 1 && $day >= 20) || ($month == 2 && $day <= 18)) return "Aquarius";
+            elseif (($month == 2 && $day >= 19) || ($month == 3 && $day <= 20)) return "Pisces";
+            elseif (($month == 3 && $day >= 21) || ($month == 4 && $day <= 19)) return "Aries";
+            elseif (($month == 4 && $day >= 20) || ($month == 5 && $day <= 20)) return "Taurus";
+            elseif (($month == 5 && $day >= 21) || ($month == 6 && $day <= 20)) return "Gemini";
+            elseif (($month == 6 && $day >= 21) || ($month == 7 && $day <= 22)) return "Cancer";
+            elseif (($month == 7 && $day >= 23) || ($month == 8 && $day <= 22)) return "Leo";
+            elseif (($month == 8 && $day >= 23) || ($month == 9 && $day <= 22)) return "Virgo";
+            elseif (($month == 9 && $day >= 23) || ($month == 10 && $day <= 22)) return "Libra";
+            elseif (($month == 10 && $day >= 23) || ($month == 11 && $day <= 21)) return "Scorpio";
+            elseif (($month == 11 && $day >= 22) || ($month == 12 && $day <= 21)) return "Sagittarius";
+            else return "Capricorn";
         }
-        return "Unknown";
+
+        $sign = getZodiacSign($month, $day);
+        $trait = $traits[$sign] ?? "The Unique";
+
+        $_SESSION['zodiac_sign'] = $sign;
+        $_SESSION['zodiac_trait'] = $trait;
+        setcookie("zodiac_sign", $sign, time() + (86400 * 30), "/");
+        setcookie("zodiac_trait", $trait, time() + (86400 * 30), "/");
+
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
     }
-
-    $sign = getZodiacSign($month, $day);
-
-    $traits = [
-        "Aries" => "The Bold",
-        "Taurus" => "The Grounded",
-        "Gemini" => "The Curious",
-        "Cancer" => "The Nurturer",
-        "Leo" => "The Radiant",
-        "Virgo" => "The Perfectionist",
-        "Libra" => "The Harmonizer",
-        "Scorpio" => "The Intense",
-        "Sagittarius" => "The Adventurer",
-        "Capricorn" => "The Ambitious",
-        "Aquarius" => "The Visionary",
-        "Pisces" => "The Whimsical"
-    ];
-
-    $trait = $traits[$sign] ?? "The Unique";
-
-    // Save in session and cookie
-    $_SESSION['zodiac_sign'] = $sign;
-    $_SESSION['zodiac_trait'] = $trait;
-    setcookie("zodiac_sign", $sign, time() + (86400 * 30), "/");
-    setcookie("zodiac_trait", $trait, time() + (86400 * 30), "/");
 }
 
-// If zodiac is still missing in session/cookies, redirect
 $sign = $_SESSION['zodiac_sign'] ?? $_COOKIE['zodiac_sign'] ?? null;
-$trait = $_SESSION['zodiac_trait'] ?? $_COOKIE['zodiac_trait'] ?? null;
+$trait = $traits[$sign] ?? ($_SESSION['zodiac_trait'] ?? $_COOKIE['zodiac_trait'] ?? "The Unique");
 
 if (!$sign) {
     header("Location: get_to_know.php");
-    exit();
+    exit;
 }
 
-// Include navbar
 include("../includes/navbar.php");
 ?>
 
@@ -85,22 +75,22 @@ include("../includes/navbar.php");
             margin: 0;
             padding: 0;
             overflow-y: scroll;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
             background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
             font-family: 'Poppins', sans-serif;
         }
-        body::-webkit-scrollbar { display: none; }
 
         .result-container {
-            min-height: 100vh;
+            min-height: calc(100vh - 80px);
             display: flex;
-            align-items: center;
-            justify-content: center;
             flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* content starts under navbar */
+            padding-top: 120px; /* spacing for navbar */
+            padding-bottom: 80px; /* space for scroll bottom */
             position: relative;
-            top: -70px;
+            z-index: 1;
         }
+
         .result-box {
             background-color: #2e2e2e;
             color: #ffffff;
@@ -162,6 +152,13 @@ include("../includes/navbar.php");
             background-color: #8c77c5;
             transform: scale(1.05);
         }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent;
+}
     </style>
 </head>
 <body>
