@@ -6,6 +6,7 @@ include(__DIR__ . "/includes/navbar.php");
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <meta charset="UTF-8">
   <title>CelestiCare</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -111,7 +112,6 @@ include(__DIR__ . "/includes/navbar.php");
   </style>
 </head>
 <body>
-
   <section class="hero-section">
     <div class="hero-text">
       <h1>Let the stars guide your taste</h1>

@@ -1,11 +1,57 @@
 <?php
 session_start();
 include(__DIR__ . "/../includes/navbar.php");
+include(__DIR__ . "/../config/dbconfig.php"); // ✅ For DB updates
 
 // Optional: pre-fill form if user already entered details
 $name = $_SESSION['name'] ?? '';
 $birthdate = $_SESSION['birthdate'] ?? '';
 $gender = $_SESSION['gender'] ?? '';
+
+// ✅ Handle form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $name = trim($_POST['name']);
+    $birthdate = trim($_POST['birthdate']);
+    $gender = trim($_POST['gender']);
+
+    // Save all to session (works even if not logged in)
+    $_SESSION['name'] = $name;
+    $_SESSION['birthdate'] = $birthdate;
+    $_SESSION['gender'] = $gender;
+
+    // ✅ Calculate zodiac sign from birthdate
+    $month = date('m', strtotime($birthdate));
+    $day = date('d', strtotime($birthdate));
+    $zodiac_sign = '';
+
+    if (($month == 3 && $day >= 21) || ($month == 4 && $day <= 19)) $zodiac_sign = 'Aries';
+    elseif (($month == 4 && $day >= 20) || ($month == 5 && $day <= 20)) $zodiac_sign = 'Taurus';
+    elseif (($month == 5 && $day >= 21) || ($month == 6 && $day <= 20)) $zodiac_sign = 'Gemini';
+    elseif (($month == 6 && $day >= 21) || ($month == 7 && $day <= 22)) $zodiac_sign = 'Cancer';
+    elseif (($month == 7 && $day >= 23) || ($month == 8 && $day <= 22)) $zodiac_sign = 'Leo';
+    elseif (($month == 8 && $day >= 23) || ($month == 9 && $day <= 22)) $zodiac_sign = 'Virgo';
+    elseif (($month == 9 && $day >= 23) || ($month == 10 && $day <= 22)) $zodiac_sign = 'Libra';
+    elseif (($month == 10 && $day >= 23) || ($month == 11 && $day <= 21)) $zodiac_sign = 'Scorpio';
+    elseif (($month == 11 && $day >= 22) || ($month == 12 && $day <= 21)) $zodiac_sign = 'Sagittarius';
+    elseif (($month == 12 && $day >= 22) || ($month == 1 && $day <= 19)) $zodiac_sign = 'Capricorn';
+    elseif (($month == 1 && $day >= 20) || ($month == 2 && $day <= 18)) $zodiac_sign = 'Aquarius';
+    elseif (($month == 2 && $day >= 19) || ($month == 3 && $day <= 20)) $zodiac_sign = 'Pisces';
+
+    $_SESSION['zodiac_sign'] = $zodiac_sign;
+
+    // ✅ Save to DB only if user is logged in
+    if (isset($_SESSION['user_id'])) {
+        $user_id = $_SESSION['user_id'];
+        $query = "UPDATE users SET name = ?, birthdate = ?, gender = ?, zodiac_sign = ? WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ssssi", $name, $birthdate, $gender, $zodiac_sign, $user_id);
+        $stmt->execute();
+    }
+
+    // Continue to zodiac calculation
+    header("Location: ../zodiac/zodiac_result.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -54,7 +100,8 @@ $gender = $_SESSION['gender'] ?? '';
         <h2>Time to get to know you</h2>
         <p>Provide the following details below</p>
 
-        <form action="../zodiac/zodiac_result.php" method="POST">
+        <!-- ✅ same-page POST -->
+        <form action="" method="POST">
             <div class="mb-3">
                 <input type="text" name="name" class="form-control" placeholder="Name" value="<?= htmlspecialchars($name) ?>" required>
             </div>

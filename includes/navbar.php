@@ -62,16 +62,20 @@ $BASE = '/celesticare';
 
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
       <ul class="navbar-nav align-items-center">
+
         <?php if (!empty($_SESSION['user_id'])): ?>
           <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/dashboard/index.php">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/auth/edit_profile.php">Edit Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/zodiac/index.php">Zodiacs</a></li>
+          <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/fashion-data/index.php">Fashion Data</a></li>
+          <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/about.php">About Us</a></li>
           <li class="nav-item"><a class="nav-link text-danger" href="<?= $BASE ?>/auth/logout.php">Logout</a></li>
+
         <?php else: ?>
           <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/index.php">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/about.php">About</a></li>
           <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/auth/register.php">Sign Up</a></li>
-          <li class="nav-item"><a class="nav-link" href="<?= $BASE ?>/auth/login.php">Login</a></li>
         <?php endif; ?>
+
       </ul>
     </div>
   </div>
