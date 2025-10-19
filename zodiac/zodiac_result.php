@@ -75,7 +75,7 @@ include("../includes/navbar.php");
             margin: 0;
             padding: 0;
             overflow-y: scroll;
-            background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
+            background: linear-gradient(135deg, #ab8df1ff 0%, #e9e4f0 100%);
             font-family: 'Poppins', sans-serif;
         }
 

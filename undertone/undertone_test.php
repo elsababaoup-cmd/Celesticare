@@ -32,7 +32,7 @@ if (isset($_GET['tone'])) {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
 body {
-  background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
+  background: linear-gradient(135deg, #b99aeeff 0%, #e9e4f0 100%);
   font-family: 'Poppins', sans-serif;
   text-align: center;
   padding-top: 140px;

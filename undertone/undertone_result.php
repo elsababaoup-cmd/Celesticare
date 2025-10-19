@@ -113,7 +113,7 @@ $wheelImage = $wheelImages[$undertone] ?? "assets/neutral_wheel.png";
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
-    background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
+    background: linear-gradient(135deg, #d3cce3 0%, #8d65c6ff 100%);
     padding-top: 80px; /* navbar height */
     overflow-y: auto; /* enable scrolling */
     scrollbar-width: none; /* Firefox */
@@ -371,9 +371,16 @@ body::-webkit-scrollbar {
     </div>
 
     <!-- Continue Button -->
-    <<button type="button" class="btn btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">
-  Continue
-</button>
+    <?php if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])): ?>
+      <!-- If logged in, go straight to dashboard -->
+      <a href="../dashboard/index.php" class="btn btn-login">Continue</a>
+    <?php else: ?>
+      <!-- If not logged in, open the modal -->
+    <button type="button" class="btn btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">
+        Continue
+      </button>
+    <?php endif; ?>
+
 
 <!-- LOGIN MODAL -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
@@ -560,7 +567,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 })();
-</script>
 
+// ✅ Get the PHP values from the server
+const zodiac = "<?= htmlspecialchars($zodiac) ?>";
+const undertone = "<?= htmlspecialchars($undertone) ?>";
+const season = "<?= htmlspecialchars($season ?? '') ?>"; // in case it's null
+
+// ✅ Only save if user is logged in and we have valid data
+<?php if (isset($_SESSION['user_id'])): ?>
+if (zodiac && undertone) {
+  fetch("../user/save_color_data.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      zodiac: zodiac,
+      undertone: undertone,
+      season: season
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("✅ Save color response:", data);
+  })
+  .catch(err => console.error("❌ Error saving color data:", err));
+}
+<?php endif; ?>
+</script>
 </body>
 </html>

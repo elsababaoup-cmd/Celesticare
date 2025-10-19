@@ -68,9 +68,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             overflow-y: scroll;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
+            background: linear-gradient(135deg, #8e57b375 0%, #634b8653 100%);
             font-family: 'Poppins', sans-serif;
         }
+
+        .bg-accent.one { background: #bba6ff; width: 400px; height: 400px; top: -80px; left: -80px; }
+        .bg-accent.two { background: #d2b0ff; width: 500px; height: 500px; bottom: -100px; right: -100px; }
+
         body::-webkit-scrollbar { display: none; }
         .setup-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
         .setup-box {
