@@ -110,25 +110,151 @@ if (!empty($aesthetic_result) && array_key_exists($aesthetic_result, $aesthetics
     $aesthetic_image = $aesthetics[$aesthetic_result]['side1'];
 }
 
-// ✅ Astro facts
-$astroFacts = [
-    "Aries" => "You are bold, ambitious, and a natural leader.",
-    "Taurus" => "You value comfort and beauty in all things.",
-    "Gemini" => "Your curiosity and wit make you adaptable.",
-    "Cancer" => "You are intuitive and deeply caring.",
-    "Leo" => "Your creativity shines brightly.",
-    "Virgo" => "You find harmony in order and detail.",
-    "Libra" => "Balance and beauty guide your choices.",
-    "Scorpio" => "You're magnetic and passionate.",
-    "Sagittarius" => "Your adventurous heart inspires others.",
-    "Capricorn" => "You are grounded and ambitious.",
-    "Aquarius" => "You think differently and value authenticity.",
-    "Pisces" => "Your creativity and empathy define you."
+// ✅ Enhanced Astro facts with detailed information
+$zodiacDetails = [
+    "Aries" => [
+        "personality" => "Energetic, bold, confident, and adventurous.",
+        "element" => "Fire",
+        "planet" => "Mars",
+        "lucky_numbers" => "1, 9, 14",
+        "strengths" => "Courageous, passionate, determined",
+        "weaknesses" => "Impulsive, impatient, short-tempered",
+        "traits" => "Aries is about action and leadership, always ready to start new adventures and face challenges head-on.",
+        "compatibility" => "Best matches with Leo and Sagittarius."
+    ],
+    "Taurus" => [
+        "personality" => "Patient, reliable, practical, and loving.",
+        "element" => "Earth",
+        "planet" => "Venus",
+        "lucky_numbers" => "2, 6, 9",
+        "strengths" => "Loyal, persistent, trustworthy",
+        "weaknesses" => "Stubborn, possessive, resistant to change",
+        "traits" => "Taurus values comfort and stability, enjoying the finer things in life and lasting relationships.",
+        "compatibility" => "Best matches with Virgo and Capricorn."
+    ],
+    "Gemini" => [
+        "personality" => "Curious, adaptable, witty, and sociable.",
+        "element" => "Air",
+        "planet" => "Mercury",
+        "lucky_numbers" => "3, 5, 7",
+        "strengths" => "Intelligent, expressive, versatile",
+        "weaknesses" => "Inconsistent, indecisive, restless",
+        "traits" => "Gemini thrives on communication and learning, always exploring new ideas and experiences.",
+        "compatibility" => "Best matches with Libra and Aquarius."
+    ],
+    "Cancer" => [
+        "personality" => "Emotional, caring, protective, and intuitive.",
+        "element" => "Water",
+        "planet" => "Moon",
+        "lucky_numbers" => "2, 7, 11",
+        "strengths" => "Loyal, empathetic, nurturing",
+        "weaknesses" => "Moody, sensitive, clingy",
+        "traits" => "Cancer values home, family, and emotional security, guided by deep feelings and compassion.",
+        "compatibility" => "Best matches with Scorpio and Pisces."
+    ],
+    "Leo" => [
+        "personality" => "Confident, charismatic, generous, and creative.",
+        "element" => "Fire",
+        "planet" => "Sun",
+        "lucky_numbers" => "1, 3, 10",
+        "strengths" => "Ambitious, warm-hearted, loyal",
+        "weaknesses" => "Arrogant, stubborn, attention-seeking",
+        "traits" => "Leo loves to shine and lead, inspiring others through enthusiasm and self-expression.",
+        "compatibility" => "Best matches with Aries and Sagittarius."
+    ],
+    "Virgo" => [
+        "personality" => "Practical, analytical, reliable, and modest.",
+        "element" => "Earth",
+        "planet" => "Mercury",
+        "lucky_numbers" => "5, 14, 23",
+        "strengths" => "Detail-oriented, hardworking, intelligent",
+        "weaknesses" => "Overcritical, perfectionist, anxious",
+        "traits" => "Virgo is focused on improvement, organization, and helping others in meaningful ways.",
+        "compatibility" => "Best matches with Taurus and Capricorn."
+    ],
+    "Libra" => [
+        "personality" => "Charming, fair-minded, diplomatic, and sociable.",
+        "element" => "Air",
+        "planet" => "Venus",
+        "lucky_numbers" => "6, 15, 24",
+        "strengths" => "Cooperative, graceful, balanced",
+        "weaknesses" => "Indecisive, people-pleasing, superficial",
+        "traits" => "Libra values harmony and beauty, always striving to create peace and fairness in relationships.",
+        "compatibility" => "Best matches with Gemini and Aquarius."
+    ],
+    "Scorpio" => [
+        "personality" => "Passionate, mysterious, determined, and resourceful.",
+        "element" => "Water",
+        "planet" => "Pluto (and Mars)",
+        "lucky_numbers" => "8, 11, 18",
+        "strengths" => "Loyal, brave, intuitive",
+        "weaknesses" => "Jealous, secretive, controlling",
+        "traits" => "Scorpio is about transformation, depth, and emotional power, often symbolizing rebirth and truth.",
+        "compatibility" => "Best matches with Cancer and Pisces."
+    ],
+    "Sagittarius" => [
+        "personality" => "Adventurous, optimistic, honest, and free-spirited.",
+        "element" => "Fire",
+        "planet" => "Jupiter",
+        "lucky_numbers" => "3, 9, 12",
+        "strengths" => "Enthusiastic, open-minded, idealistic",
+        "weaknesses" => "Impulsive, blunt, inconsistent",
+        "traits" => "Sagittarius seeks knowledge and adventure, always aiming for growth and exploration.",
+        "compatibility" => "Best matches with Aries and Leo."
+    ],
+    "Capricorn" => [
+        "personality" => "Ambitious, disciplined, responsible, and patient.",
+        "element" => "Earth",
+        "planet" => "Saturn",
+        "lucky_numbers" => "4, 8, 22",
+        "strengths" => "Practical, hardworking, dependable",
+        "weaknesses" => "Pessimistic, rigid, workaholic",
+        "traits" => "Capricorn strives for success and stability, valuing structure and long-term achievements.",
+        "compatibility" => "Best matches with Taurus and Virgo."
+    ],
+    "Aquarius" => [
+        "personality" => "Innovative, original, independent, humanitarian.",
+        "element" => "Air",
+        "planet" => "Uranus",
+        "lucky_numbers" => "2, 7, 11",
+        "strengths" => "Innovative, idealistic, independent",
+        "weaknesses" => "Unpredictable, aloof, stubborn",
+        "traits" => "Aquarius is about innovation, individuality, and humanitarian causes, representing progressive ideas and social change.",
+        "compatibility" => "Best matches with Gemini and Libra."
+    ],
+    "Pisces" => [
+        "personality" => "Compassionate, artistic, gentle, and empathetic.",
+        "element" => "Water",
+        "planet" => "Neptune",
+        "lucky_numbers" => "3, 9, 12",
+        "strengths" => "Imaginative, kind, intuitive",
+        "weaknesses" => "Escapist, overly trusting, emotional",
+        "traits" => "Pisces is deeply connected to dreams and emotions, often drawn to creativity and spirituality.",
+        "compatibility" => "Best matches with Cancer and Scorpio."
+    ]
 ];
-$astroFact = $astroFacts[$zodiac] ?? "Complete your zodiac profile to unlock your astro fact!";
+
+$zodiacData = $zodiacDetails[$zodiac] ?? [
+    "personality" => "Complete your zodiac profile to unlock your astro details!",
+    "element" => "Not set",
+    "planet" => "Not set",
+    "lucky_numbers" => "Not set",
+    "strengths" => "Not set",
+    "weaknesses" => "Not set",
+    "traits" => "Complete your zodiac profile to unlock your astro details!",
+    "compatibility" => "Not set"
+];
 
 // Define the correct base path for assets
 $base_path = "/Celesticare/undertone/assets/";
+
+// Fetch outfit data for moodboard
+$outfit_stmt = $conn->prepare("SELECT outfit_data FROM user_outfits WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
+$outfit_stmt->bind_param("i", $user_id);
+$outfit_stmt->execute();
+$outfit_stmt->bind_result($outfit_json);
+$outfit_stmt->fetch();
+$outfit_stmt->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -158,6 +284,10 @@ h2 { color: #6a1b9a; font-weight: 600; }
     background-color: #fff;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     padding: 20px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .grid-container {
     display: grid;
@@ -241,15 +371,106 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.outfit-section {
+/* Enhanced Profile Section */
+/* Fixed Profile Section */
+/* Fixed Profile Section Styles */
+.profile-section {
     border-radius: 10px;
     background-color: #fff;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     padding: 20px;
-    min-height: 200px;
+    min-height: 280px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+}
+
+.profile-info {
+    margin-top: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.profile-info p {
+    margin-bottom: 8px;
+    line-height: 1.3;
+    font-size: 0.95rem;
+    padding: 2px 0;
+}
+
+.profile-info strong {
+    color: #6a1b9a;
+    min-width: 80px;
+    display: inline-block;
+}
+
+.profile-item {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    min-height: auto;
+}
+
+.profile-label {
+    font-weight: 600;
+    color: #6a1b9a;
+    min-width: 100px;
+    font-size: 0.9rem;
+}
+
+.profile-value {
+    color: #555;
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+/* Remove any extra margins that might be causing gaps */
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Ensure grid items have consistent spacing */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+/* Fix for mobile responsiveness */
+@media (max-width: 768px) {
+    .profile-info p {
+        margin-bottom: 6px;
+        line-height: 1.2;
+    }
+    
+    .profile-item {
+        margin-bottom: 6px;
+    }
+    
+    .profile-label {
+        min-width: 90px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-info p {
+        margin-bottom: 5px;
+        font-size: 0.85rem;
+    }
+    
+    .profile-label {
+        min-width: 80px;
+        font-size: 0.85rem;
+    }
+    
+    .profile-value {
+        font-size: 0.85rem;
+    }
 }
 
 /* Single item preview */
@@ -352,12 +573,107 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
     font-weight: 500;
 }
 
-/* Ensure sections align properly */
-.aesthetic-section, .outfit-section {
-    min-height: 280px;
+/* Enhanced Astro Section */
+.zodiac-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.zodiac-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #6a1b9a;
+    margin-bottom: 15px;
+}
+
+.zodiac-details {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.zodiac-detail-item {
+    margin-bottom: 8px;
+    display: flex;
+}
+
+.zodiac-label {
+    font-weight: 600;
+    color: #6a1b9a;
+    min-width: 120px;
+}
+
+.zodiac-value {
+    color: #555;
+    flex: 1;
+}
+
+/* Enhanced Moodboard Section */
+.moodboard-complete {
+    background: linear-gradient(135deg, #8B5FBF, #6D28D9);
+    color: white;
+    text-align: center;
+    border-radius: 10px;
+    padding: 25px 20px;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.moodboard-complete:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(139, 95, 191, 0.3);
+}
+
+.moodboard-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.moodboard-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.moodboard-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.moodboard-incomplete {
+    background: #f8f9fa;
+    text-align: center;
+    border-radius: 10px;
+    padding: 25px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed #dee2e6;
+}
+
+.moodboard-incomplete-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.moodboard-incomplete-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.moodboard-incomplete-subtitle {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 15px;
 }
 
 /* Responsive adjustments */
@@ -370,6 +686,31 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
     .enhanced-aesthetic-image {
         height: 140px;
     }
+    
+    .zodiac-detail-item,
+    .profile-item {
+        flex-direction: column;
+    }
+    
+    .zodiac-label,
+    .profile-label {
+        min-width: auto;
+        margin-bottom: 2px;
+    }
+    
+    .profile-label {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-label {
+        min-width: 110px;
+    }
 }
 </style>
 </head>
@@ -381,19 +722,76 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
         <p>This is your dashboard where your zodiac style journey begins.</p>
 
         <div class="grid-container mt-4">
+            <!-- Enhanced Profile Section - FIXED VERSION -->
             <div class="profile-section">
                 <div class="section-title">Profile</div>
-                <p><strong>Name:</strong> <span id="displayName"><?= $name ?: 'Not set' ?></span></p>
-                <p><strong>Username:</strong> <?= $username ?></p>
-                <p><strong>Email:</strong> <?= $email ?></p>
-                <p><strong>Gender Preference:</strong> <span id="displayGender"><?= $gender ?: 'Not set' ?></span></p>
-                <p><strong>Date of Birth:</strong> <span id="displayBirthdate"><?= $birthdate ?: 'Not set' ?></span></p>
-                <p><strong>Zodiac Sign:</strong> <span id="displayZodiac"><?= $zodiac ?></span></p>
+                <div class="profile-info">
+                    <div class="profile-item">
+                        <span class="profile-label">Name:</span>
+                        <span class="profile-value" id="displayName"><?= $name ?: 'Not set' ?></span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Username:</span>
+                        <span class="profile-value"><?= $username ?></span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Email:</span>
+                        <span class="profile-value"><?= $email ?></span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Gender:</span>
+                        <span class="profile-value" id="displayGender"><?= $gender ?: 'Not set' ?></span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Birthdate:</span>
+                        <span class="profile-value" id="displayBirthdate"><?= $birthdate ?: 'Not set' ?></span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Zodiac:</span>
+                        <span class="profile-value" id="displayZodiac"><?= $zodiac ?></span>
+                    </div>
+                </div>
             </div>
-
+            <!-- 🌟 Enhanced Astro Section -->
             <div class="astro-section">
-                <div class="section-title">Astro Fact</div>
-                <p id="displayFact"><?= $astroFact ?></p>
+                <div class="section-title">Astro Insights</div>
+                <div class="zodiac-header">
+                    <div class="zodiac-name">Your Zodiac Sign: <?= $zodiac ?></div>
+                </div>
+                <div class="zodiac-details">
+                    <div class="zodiac-detail-item">
+                        <span class="zodiac-label">Personality:</span>
+                        <span class="zodiac-value"><?= $zodiacData['personality'] ?></span>
+                    </div>
+                    <div class="zodiac-detail-item">
+                        <span class="zodiac-label">Element:</span>
+                        <span class="zodiac-value"><?= $zodiacData['element'] ?></span>
+                    </div>
+                    <div class="zodiac-detail-item">
+                        <span class="zodiac-label">Ruling Planet:</span>
+                        <span class="zodiac-value"><?= $zodiacData['planet'] ?></span>
+                    </div>
+                    <div class="zodiac-detail-item">
+                        <span class="zodiac-label">Lucky Numbers:</span>
+                        <span class="zodiac-value"><?= $zodiacData['lucky_numbers'] ?></span>
+                    </div>
+                    <div class="zodiac-detail-item">
+                        <span class="zodiac-label">Strengths:</span>
+                        <span class="zodiac-value"><?= $zodiacData['strengths'] ?></span>
+                    </div>
+                    <div class="zodiac-detail-item">
+                        <span class="zodiac-label">Weaknesses:</span>
+                        <span class="zodiac-value"><?= $zodiacData['weaknesses'] ?></span>
+                    </div>
+                    <div class="zodiac-detail-item">
+                        <span class="zodiac-label">Traits:</span>
+                        <span class="zodiac-value"><?= $zodiacData['traits'] ?></span>
+                    </div>
+                    <div class="zodiac-detail-item">
+                        <span class="zodiac-label">Compatibility:</span>
+                        <span class="zodiac-value"><?= $zodiacData['compatibility'] ?></span>
+                    </div>
+                </div>
             </div>
 
             <!-- 🎨 Color Analysis -->
@@ -440,7 +838,7 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
                 <?php if ($undertone && $undertone !== 'Not set'): ?>
                     <a id="analyzeBtn" href="../undertone/undertone_result.php" class="btn-style">View Full Analysis</a>
                 <?php else: ?>
-                    <a id="analyzeBtn" href="../undertone/undertone_test.php" class="btn-style">I want to know!</a>
+                    <a id="analyzeBtn" href="../setup/get_to_know.php" class="btn-style">I want to know!</a>
                 <?php endif; ?>
             </div>
 
@@ -529,13 +927,6 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
                     
                     <!-- Enhanced Clothing Display -->
                     <?php 
-                    $outfit_stmt = $conn->prepare("SELECT outfit_data FROM user_outfits WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
-                    $outfit_stmt->bind_param("i", $user_id);
-                    $outfit_stmt->execute();
-                    $outfit_stmt->bind_result($outfit_json);
-                    $outfit_stmt->fetch();
-                    $outfit_stmt->close();
-                    
                     if (!empty($outfit_json)) {
                         $outfit_items = json_decode($outfit_json, true);
                         if (!empty($outfit_items)) {
@@ -571,11 +962,38 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
                     </div>
                 <?php endif; ?>
             </div>
-            <!-- 🪞 Moodboard Section -->
-            <div class="moodboard-section text-center">
-                <div class="section-title mb-2">Moodboard</div>
-                <p>Visualized Personal Moodboard.</p>
-                <a href="/Celesticare/moodboard/moodboard_result.php" class="btn-style">Go to Moodboard</a>
+
+            <!-- 🎨 Moodboard Section - SUBTLE VERSION -->
+            <div class="moodboard-section">
+                <?php 
+                // Check if user has completed both aesthetic and style quizzes
+                $hasMoodboard = !empty($aesthetic_result) && !empty($style_result);
+                
+                if ($hasMoodboard): 
+                ?>
+                    <!-- Complete State - Colorful and Simple -->
+                    <div class="moodboard-complete">
+                        <div class="moodboard-icon">🎨</div>
+                        <div class="moodboard-title">Your Moodboard is Ready!</div>
+                        <div class="moodboard-subtitle">Explore your personalized style visualization</div>
+                        <a href="/Celesticare/moodboard/moodboard_result.php" class="btn-style" style="background: #fff; color: #8B5FBF;">View Moodboard</a>
+                    </div>
+                <?php else: ?>
+                    <!-- Incomplete State - Simple and Uniform -->
+                    <div class="moodboard-incomplete">
+                        <div class="moodboard-incomplete-icon">🎨</div>
+                        <div class="moodboard-incomplete-title">Moodboard</div>
+                        <div class="moodboard-incomplete-subtitle">Complete your style journey to unlock</div>
+                        <div class="action-buttons mt-3">
+                            <?php if (empty($aesthetic_result)): ?>
+                                <a href="../quizzes/aesthetic_welcome.php" class="btn-style">Start Aesthetic Quiz</a>
+                            <?php endif; ?>
+                            <?php if (empty($style_result)): ?>
+                                <a href="../quizzes/style_welcome.php" class="btn-style">Start Style Quiz</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -679,27 +1097,10 @@ document.getElementById("editProfileForm").addEventListener("submit", async func
       document.getElementById("displayZodiac").textContent = result.data.zodiac_sign || "Not set";
       document.getElementById("displayZodiacColor").textContent = result.data.zodiac_sign || "Not set";
       
-      // Update astro fact
-      const astroFacts = {
-        "Aries": "You are bold, ambitious, and a natural leader.",
-        "Taurus": "You value comfort and beauty in all things.",
-        "Gemini": "Your curiosity and wit make you adaptable.",
-        "Cancer": "You are intuitive and deeply caring.",
-        "Leo": "Your creativity shines brightly.",
-        "Virgo": "You find harmony in order and detail.",
-        "Libra": "Balance and beauty guide your choices.",
-        "Scorpio": "You're magnetic and passionate.",
-        "Sagittarius": "Your adventurous heart inspires others.",
-        "Capricorn": "You are grounded and ambitious.",
-        "Aquarius": "You think differently and value authenticity.",
-        "Pisces": "Your creativity and empathy define you."
-      };
-      document.getElementById("displayFact").textContent = astroFacts[result.data.zodiac_sign] || "Complete your zodiac profile to unlock your astro fact!";
-      
       const modal = bootstrap.Modal.getInstance(document.getElementById("editProfileModal"));
       modal.hide();
       
-      // Reload the page to update the color analysis section
+      // Reload the page to update all sections
       setTimeout(() => {
         location.reload();
       }, 1000);
