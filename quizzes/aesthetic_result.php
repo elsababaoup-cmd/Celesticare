@@ -3,7 +3,6 @@ session_start();
 include("../includes/navbar.php");
 include("../config/dbconfig.php");
 
-// 🟣 Check user login
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../auth/login.php");
     exit();
@@ -11,11 +10,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// 🟣 Get aesthetic result from GET, SESSION, or DB
 $aesthetic = $_GET['aesthetic'] ?? $_SESSION['aesthetic_result'] ?? null;
 
 if (!$aesthetic) {
-    // If not in session or URL, check database
     $stmt = $conn->prepare("SELECT aesthetic_result FROM users WHERE id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
@@ -25,14 +22,12 @@ if (!$aesthetic) {
 
     if ($db_aesthetic) {
         $aesthetic = $db_aesthetic;
-        $_SESSION['aesthetic_result'] = $aesthetic; // Store in session for later use
+        $_SESSION['aesthetic_result'] = $aesthetic; // Store in session
     } else {
-        // If no record found, redirect to quiz
         header("Location: aesthetic_quiz.php");
         exit();
     }
 } else {
-    // Save/update to DB if new result detected
     $stmt = $conn->prepare("UPDATE users SET aesthetic_result = ? WHERE id = ?");
     $stmt->bind_param("si", $aesthetic, $user_id);
     $stmt->execute();
@@ -40,81 +35,87 @@ if (!$aesthetic) {
     $_SESSION['aesthetic_result'] = $aesthetic;
 }
 
-// 🩵 Define aesthetic details
 $aesthetics = [
   "academia" => [
     "title" => "The Scholar",
-    "desc" => "You’re drawn to timeless sophistication — think books, tweed, and candlelit study sessions. You find beauty in intellect and classic detail.",
+    "desc" => "You're drawn to timeless sophistication — think books, tweed, and candlelit study sessions. You find beauty in intellect and classic detail.",
     "history" => "Rooted in literary charm and old-world academia, this aesthetic draws from classic literature, university libraries, and British collegiate style.",
     "mood" => "Intellectual • Vintage • Poised",
-    "bg" => "../quizzes/assets/acad1.jpg",
-    "side1" => "../quizzes/assets/acad2.jpg",
+    "bg" => "../quizzes/assets/acad_bg3.jpg",
+    "side1" => "../quizzes/assets/acad1.jpg",
     "side2" => "../quizzes/assets/acad3.jpg",
-    "color" => "#271a0eff"
+    "color" => "#271a0eff",
+    "music" => "../music/acad.mp3"
   ],
   "boho" => [
     "title" => "The Bohemian Dreamer",
     "desc" => "You embody freedom, creativity, and a love for earthy tones and textures. Every outfit tells a story — unbothered, soulful, and effortlessly chic.",
     "history" => "Emerging from 1960s counterculture, Bohemian style fuses artistic expression with natural fabrics and global influences.",
     "mood" => "Free-Spirited • Earthy • Artistic",
-    "bg" => "../quizzes/assets/boho1.jpg",
+    "bg" => "../quizzes/assets/boho_bg2.jpg",
     "side1" => "../quizzes/assets/boho2.jpg",
-    "side2" => "../quizzes/assets/boho3.jpg",
-    "color" => "#e38153ff"
+    "side2" => "../quizzes/assets/boho1.jpg",
+    "color" => "#e38153ff",
+    "music" => "../music/boho.mp3"
   ],
   "coquette" => [
     "title" => "The Coquette Muse",
     "desc" => "Romantic and soft, your style leans into vintage elegance — ribbons, lace, and an air of flirtatious nostalgia.",
     "history" => "Blending Rococo-era charm with 90s Lolita revival, the Coquette aesthetic celebrates femininity and delicate romanticism.",
     "mood" => "Romantic • Vintage • Playful",
-    "bg" => "../quizzes/assets/coquette12.jpg",
+    "bg" => "../quizzes/assets/coquette_bg.jpg",
     "side1" => "../quizzes/assets/coquette2.jpg",
-    "side2" => "../quizzes/assets/coquette3.jpg",
-    "color" => "#f5c4d4"
+    "side2" => "../quizzes/assets/coquette12.jpg",
+    "color" => "#f5c4d4",
+    "music" => "../music/coquette.mp3"
   ],
   "grunge" => [
     "title" => "The Rebel Soul",
     "desc" => "You thrive in expressive chaos — distressed textures, dark tones, and a bold disregard for convention define your edge.",
     "history" => "Born from 90s alternative rock culture, Grunge fashion embodies rebellion, comfort, and raw individuality.",
     "mood" => "Edgy • Unfiltered • Rebellious",
-    "bg" => "../quizzes/assets/grunge1.jpg",
+    "bg" => "../quizzes/assets/grunge_bg2.jpg",
     "side1" => "../quizzes/assets/grunge2.jpg",
     "side2" => "../quizzes/assets/grunge3.jpg",
-    "color" => "#a1a1a1ff"
+    "color" => "#a1a1a1ff",
+    "music" => "../music/grunge.mp3"
   ],
   "punk" => [
     "title" => "The Anarchic Icon",
     "desc" => "You wear rebellion like armor — unapologetic, loud, and endlessly cool. Spikes, leather, and confidence are your essentials.",
     "history" => "Emerging from 1970s UK subcultures, punk aesthetic rejected mainstream norms through fashion, music, and activism.",
     "mood" => "Defiant • Raw • Bold",
-    "bg" => "../quizzes/assets/punk1.jpg",
-    "side1" => "../quizzes/assets/punk2.jpg",
+    "bg" => "../quizzes/assets/punk_bg1.jpg",
+    "side1" => "../quizzes/assets/punk1.jpg",
     "side2" => "../quizzes/assets/punk3.jpg",
-    "color" => "#ff0000ff"
+    "color" => "#ff0000ff",
+    "music" => "../music/punk.mp3"
   ],
   "y2k" => [
     "title" => "The Futuristic Popstar",
     "desc" => "You radiate playful confidence with metallics, baby tees, and digital-era nostalgia. The early 2000s live in your sparkle.",
     "history" => "A revival of late 90s and early 2000s cyber fashion — glossy textures, technology-inspired motifs, and glittery confidence.",
     "mood" => "Playful • Futuristic • Glam",
-    "bg" => "../quizzes/assets/y2k1.jpg",
-    "side1" => "../quizzes/assets/y2k2.jpg",
+    "bg" => "../quizzes/assets/y2k_bg2.jpg",
+    "side1" => "../quizzes/assets/y2k1.jpg",
     "side2" => "../quizzes/assets/y2k3.jpg",
-    "color" => "#d46be3"
+    "color" => "#d46be3",
+    "music" => "../music/y2k.mp3"
   ],
   "luxurious" => [
     "title" => "The Luxe Visionary",
     "desc" => "Glitter, confidence, and high drama — your aura screams sophistication and luxury. You turn moments into red-carpet statements.",
     "history" => "Rooted in Old Hollywood and modern couture, Glam embraces opulence, allure, and timeless beauty.",
     "mood" => "Elegant • Dazzling • Confident",
-    "bg" => "../quizzes/assets/glam1.jpg",
+    "bg" => "../quizzes/assets/glam_bg1.jpg",
     "side1" => "../quizzes/assets/glam2.jpg",
-    "side2" => "../quizzes/assets/glam3.jpg",
-    "color" => "#c93939ff"
+    "side2" => "../quizzes/assets/glam1.jpg",
+    "color" => "#c93939ff",
+    "music" => "../music/glam.mp3"
   ]
 ];
 
-// Fallback if aesthetic not found
+// Fallback 
 if (!array_key_exists($aesthetic, $aesthetics)) $aesthetic = "boho";
 $data = $aesthetics[$aesthetic];
 ?>
@@ -147,7 +148,7 @@ body {
   overflow: hidden;
 }
 
-/* Left and right side images (magazine layout) */
+/* (magazine layout) */
 .side-image {
   position: absolute;
   top: 50%;
@@ -168,7 +169,7 @@ body {
 .side-left { left: 60px; }
 .side-right { right: 60px; }
 
-/* Main text */
+/* Main */
 .result-card {
   background: rgba(255,255,255,0.15);
   backdrop-filter: blur(20px);
@@ -242,6 +243,67 @@ p {
   color: <?php echo $data['color']; ?>;
 }
 
+/* Music  Button */
+.music-control {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.music-control:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.1);
+}
+
+.music-control.muted {
+  background: rgba(255,255,255,0.1);
+  color: #ccc;
+}
+
+.music-control {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.music-control:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.1);
+}
+
+.music-control.muted {
+  background: rgba(255,255,255,0.1);
+  color: #ccc;
+}
+
 html::-webkit-scrollbar, body::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
@@ -251,6 +313,18 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 </head>
 
 <body>
+<!-- Music Player -->
+<audio id="backgroundMusic" autoplay loop>
+    <source src="<?php echo $data['music']; ?>" type="audio/mpeg">
+    <source src="<?php echo str_replace('.mp3', '.ogg', $data['music']); ?>" type="audio/ogg">
+    Your browser does not support the audio element.
+</audio>
+
+<!-- Music Button -->
+<div id="musicControl" class="music-control" title="Click to mute/unmute">
+    🔈
+</div>
+
 <div class="result-overlay">
   <img src="<?php echo $data['side1']; ?>" alt="Aesthetic Side 1" class="side-image side-left">
   <img src="<?php echo $data['side2']; ?>" alt="Aesthetic Side 2" class="side-image side-right">
@@ -273,5 +347,69 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
     </div>
   </div>
 </div>
+
+<script>
+// Music control functionality
+const music = document.getElementById('backgroundMusic');
+const musicControl = document.getElementById('musicControl');
+
+music.volume = 0.1;
+
+window.addEventListener('load', function() {
+    music.play().catch(error => {
+        console.log('Autoplay prevented:', error);
+       
+        musicControl.innerHTML = '▶️';
+        musicControl.title = 'Click to play music (autoplay was blocked)';
+    });
+});
+
+
+musicControl.addEventListener('click', function() {
+    if (music.paused) {
+
+        music.play().then(() => {
+            music.muted = false;
+            musicControl.innerHTML = '🔈';
+            musicControl.classList.remove('muted');
+            musicControl.title = 'Click to mute';
+        }).catch(error => {
+            console.log('Play failed:', error);
+        });
+    } else {
+
+        music.muted = !music.muted;
+        if (music.muted) {
+            musicControl.innerHTML = '🔇';
+            musicControl.classList.add('muted');
+            musicControl.title = 'Click to unmute';
+        } else {
+            musicControl.innerHTML = '🔈';
+            musicControl.classList.remove('muted');
+            musicControl.title = 'Click to mute';
+        }
+    }
+});
+
+
+music.addEventListener('loadeddata', function() {
+    if (music.muted) {
+        musicControl.innerHTML = '🔇';
+        musicControl.classList.add('muted');
+    } else {
+        musicControl.innerHTML = '🔈';
+        musicControl.classList.remove('muted');
+    }
+});
+
+
+music.addEventListener('pause', function() {
+    if (music.currentTime === 0) {
+
+        musicControl.innerHTML = '▶️';
+        musicControl.title = 'Click to play music';
+    }
+});
+</script>
 </body>
 </html>

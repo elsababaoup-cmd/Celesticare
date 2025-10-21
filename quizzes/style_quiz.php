@@ -78,6 +78,37 @@ if (!$gender || !in_array($gender, ['feminine', 'masculine'])) {
     #finishBtn { display:block; margin:60px auto 0; padding:12px 35px; font-size:1.05rem; }
     #resetBtn { margin-top:10px; }
 
+    /* Music Control Button */
+    .music-control {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .music-control:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.1);
+    }
+
+    .music-control.muted {
+      background: rgba(255,255,255,0.1);
+      color: #ccc;
+    }
+
     .bg-accent { position:absolute; border-radius:50%; filter:blur(120px); opacity:0.3; z-index:0; animation:float 10s ease-in-out infinite alternate; }
     .bg-accent.one { background:#bba6ff; width:400px; height:400px; top:-80px; left:-80px; }
     .bg-accent.two { background:#d2b0ff; width:500px; height:500px; bottom:-100px; right:-100px; }
@@ -86,6 +117,18 @@ if (!$gender || !in_array($gender, ['feminine', 'masculine'])) {
   </style>
 </head>
 <body>
+  <!-- Music Player -->
+  <audio id="backgroundMusic" autoplay loop>
+    <source src="../music/Clear_view.mp3" type="audio/mpeg">
+    <source src="../music/style-quiz.ogg" type="audio/ogg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Music Control Button -->
+  <div id="musicControl" class="music-control" title="Click to mute/unmute">
+    🔈
+  </div>
+
   <div class="bg-accent one"></div>
   <div class="bg-accent two"></div>
 
@@ -141,6 +184,10 @@ const canvas = document.getElementById('canvas');
 const toggleGenderBtn = document.getElementById('toggleGender');
 const toggleClothesBtn = document.getElementById('toggleClothes');
 const resetBtn = document.getElementById('resetBtn');
+
+// Music control elements
+const music = document.getElementById('backgroundMusic');
+const musicControl = document.getElementById('musicControl');
 
 let currentGender = "<?php echo $gender === 'masculine' ? 'masc' : 'fem'; ?>";
 let currentClothingSet = currentGender;
@@ -203,13 +250,28 @@ const clothingSets = {
       { src: 'assets/fem/Untitled18_20251019111218.png', style: 'elegant' },
       { src: 'assets/fem/Untitled18_20251019111226.png', style: 'minimalist' },
       { src: 'assets/fem/Untitled18_20251019111232.png', style: 'businesswear' },
-      { src: 'assets/fem/Untitled18_20251019111157.png', style: 'minimalist' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021163927.png', style: 'minimalist' },
       { src: 'assets/fem/Untitled18_20251019115538.png', style: 'rough' },
       { src: 'assets/fem/Untitled18_20251019115546.png', style: 'businesswear' },
       { src: 'assets/fem/Untitled18_20251019115557.png', style: 'creative' },
       { src: 'assets/fem/Untitled18_20251019115604.png', style: 'businesswear' },
-      { src: 'assets/fem/Untitled18_20251019115608.png', style: 'cr' },
+      { src: 'assets/fem/Untitled18_20251019115608.png', style: 'creative' },
       { src: 'assets/fem/Untitled18_20251019115615.png', style: 'soft' },
+
+      { src: 'assets/fem/Untitled18_Restored2_20251021152828.png', style: 'elegant' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152833.png', style: 'creative' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152838.png', style: 'businesswear' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152843.png', style: 'minimalist' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152849.png', style: 'elegant' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152853.png', style: 'soft' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021160355.png', style: 'soft' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152905.png', style: 'elegant' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152910.png', style: 'creative' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021160004.png', style: 'soft' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152922.png', style: 'elegant' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021152930.png', style: 'elegant' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021155001.png', style: 'elegant' },
+      { src: 'assets/fem/Untitled18_Restored2_20251021163908.png', style: 'rough' },
     ],
     shoes: [
       { src: 'assets/fem/etc/shoe.png', style: 'elegant' },
@@ -397,6 +459,69 @@ const clothingSets = {
   }
 };
 
+// Music control functionality
+function setupMusic() {
+  // Set volume to 30%
+  music.volume = 0.1;
+
+  // Try to play music automatically when page loads
+  window.addEventListener('load', function() {
+    music.play().catch(error => {
+      console.log('Autoplay prevented:', error);
+      // If autoplay is blocked, show a play button
+      musicControl.innerHTML = '▶️';
+      musicControl.title = 'Click to play music (autoplay was blocked)';
+    });
+  });
+
+  // Toggle mute/unmute when music control is clicked
+  musicControl.addEventListener('click', function() {
+    if (music.paused) {
+      // If music is paused, play it
+      music.play().then(() => {
+        music.muted = false;
+        musicControl.innerHTML = '🔈';
+        musicControl.classList.remove('muted');
+        musicControl.title = 'Click to mute';
+      }).catch(error => {
+        console.log('Play failed:', error);
+      });
+    } else {
+      // If music is playing, toggle mute
+      music.muted = !music.muted;
+      if (music.muted) {
+        musicControl.innerHTML = '🔇';
+        musicControl.classList.add('muted');
+        musicControl.title = 'Click to unmute';
+      } else {
+        musicControl.innerHTML = '🔈';
+        musicControl.classList.remove('muted');
+        musicControl.title = 'Click to mute';
+      }
+    }
+  });
+
+  // Update icon based on initial state
+  music.addEventListener('loadeddata', function() {
+    if (music.muted) {
+      musicControl.innerHTML = '🔇';
+      musicControl.classList.add('muted');
+    } else {
+      musicControl.innerHTML = '🔈';
+      musicControl.classList.remove('muted');
+    }
+  });
+
+  // Handle cases where autoplay might be blocked by browser
+  music.addEventListener('pause', function() {
+    if (music.currentTime === 0) {
+      // Music was never started due to autoplay restrictions
+      musicControl.innerHTML = '▶️';
+      musicControl.title = 'Click to play music';
+    }
+  });
+}
+
 // Load mannequin
 function loadMannequin() {
   mannequin.src = currentGender === 'fem' ? '../quizzes/assets/fem_mannequin.png' : '../quizzes/assets/Untitled24_20251020142151.png';
@@ -571,6 +696,7 @@ document.getElementById('finishBtn').addEventListener('click', () => {
 });
 
 // Initial load
+setupMusic();
 loadMannequin();
 loadClothing();
 </script>

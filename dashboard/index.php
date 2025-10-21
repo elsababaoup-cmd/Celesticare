@@ -37,7 +37,7 @@ $aesthetics = [
     "history" => "Rooted in literary charm and old-world academia, this aesthetic draws from classic literature, university libraries, and British collegiate style.",
     "mood" => "Intellectual • Vintage • Poised",
     "bg" => "../quizzes/assets/acad1.jpg",
-    "side1" => "../quizzes/assets/acad2.jpg",
+    "side1" => "../quizzes/assets/acad_bg2.jpg",
     "side2" => "../quizzes/assets/acad3.jpg",
     "color" => "#271a0eff"
   ],
@@ -47,7 +47,7 @@ $aesthetics = [
     "history" => "Emerging from 1960s counterculture, Bohemian style fuses artistic expression with natural fabrics and global influences.",
     "mood" => "Free-Spirited • Earthy • Artistic",
     "bg" => "../quizzes/assets/boho1.jpg",
-    "side1" => "../quizzes/assets/boho2.jpg",
+    "side1" => "../quizzes/assets/boho1.jpg",
     "side2" => "../quizzes/assets/boho3.jpg",
     "color" => "#e38153ff"
   ],
@@ -77,7 +77,7 @@ $aesthetics = [
     "history" => "Emerging from 1970s UK subcultures, punk aesthetic rejected mainstream norms through fashion, music, and activism.",
     "mood" => "Defiant • Raw • Bold",
     "bg" => "../quizzes/assets/punk1.jpg",
-    "side1" => "../quizzes/assets/punk2.jpg",
+    "side1" => "../quizzes/assets/punk_bg2.jpg",
     "side2" => "../quizzes/assets/punk3.jpg",
     "color" => "#ff0000ff"
   ],

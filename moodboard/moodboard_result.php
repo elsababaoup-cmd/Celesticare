@@ -916,6 +916,20 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width:0!important; height:0!i
     
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+
+    // In moodboard page
+function redirectToStyleQuiz() {
+    // Create a temporary button that user must click to enable audio
+    const enableAudio = confirm("Enable background music for styling experience?");
+    if (enableAudio) {
+        // Store a flag that audio is allowed
+        localStorage.setItem('audioAllowed', 'true');
+        window.location.href = 'style_quiz.php';
+    } else {
+        localStorage.setItem('audioAllowed', 'false');
+        window.location.href = 'style_quiz.php';
+    }
+}
     // Add spinning effect to color wheel on hover
     document.addEventListener('DOMContentLoaded', function() {
       const colorWheel = document.querySelector('.color-wheel');
@@ -940,6 +954,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width:0!important; height:0!i
         });
       }
     });
+
+    
   </script>
 </body>
 </html>

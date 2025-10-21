@@ -137,6 +137,37 @@ include(__DIR__ . "/includes/navbar.php");
       filter: drop-shadow(0 0 15px rgba(166, 40, 197, 0.7));
     }
 
+    /* Music Control Button */
+    .music-control {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .music-control:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.1);
+    }
+
+    .music-control.muted {
+      background: rgba(255,255,255,0.1);
+      color: #ccc;
+    }
+
     @media (max-width: 991px) {
       .hero-section {
         flex-direction: column;
@@ -149,10 +180,30 @@ include(__DIR__ . "/includes/navbar.php");
         height: 350px;
         margin: 30px auto 0;
       }
+
+      .music-control {
+        top: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Music Player -->
+  <audio id="backgroundMusic" autoplay loop>
+    <source src="./music/Astral.mp3" type="audio/mpeg">
+    <source src="./music/homepage.ogg" type="audio/ogg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Music Control Button -->
+  <div id="musicControl" class="music-control" title="Click to mute/unmute">
+    🔈
+  </div>
+
   <!-- Starfield Background -->
   <div class="starfield" id="starfield"></div>
   
@@ -338,9 +389,75 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(startShootingStars, nextInterval);
   }
   
-  // Initialize animations
+  // Music control functionality
+  function setupMusic() {
+    const music = document.getElementById('backgroundMusic');
+    const musicControl = document.getElementById('musicControl');
+
+    music.volume = 0.3;
+
+    // Try to play music automatically when page loads
+    window.addEventListener('load', function() {
+      music.play().catch(error => {
+        console.log('Autoplay prevented:', error);
+        // If autoplay is blocked, show a play button
+        musicControl.innerHTML = '▶️';
+        musicControl.title = 'Click to play music (autoplay was blocked)';
+      });
+    });
+
+    // Toggle mute/unmute when music control is clicked
+    musicControl.addEventListener('click', function() {
+      if (music.paused) {
+        // If music is paused, play it
+        music.play().then(() => {
+          music.muted = false;
+          musicControl.innerHTML = '🔈';
+          musicControl.classList.remove('muted');
+          musicControl.title = 'Click to mute';
+        }).catch(error => {
+          console.log('Play failed:', error);
+        });
+      } else {
+        // If music is playing, toggle mute
+        music.muted = !music.muted;
+        if (music.muted) {
+          musicControl.innerHTML = '🔇';
+          musicControl.classList.add('muted');
+          musicControl.title = 'Click to unmute';
+        } else {
+          musicControl.innerHTML = '🔈';
+          musicControl.classList.remove('muted');
+          musicControl.title = 'Click to mute';
+        }
+      }
+    });
+
+    // Update icon based on initial state
+    music.addEventListener('loadeddata', function() {
+      if (music.muted) {
+        musicControl.innerHTML = '🔇';
+        musicControl.classList.add('muted');
+      } else {
+        musicControl.innerHTML = '🔈';
+        musicControl.classList.remove('muted');
+      }
+    });
+
+    // Handle cases where autoplay might be blocked by browser
+    music.addEventListener('pause', function() {
+      if (music.currentTime === 0) {
+        // Music was never started due to autoplay restrictions
+        musicControl.innerHTML = '▶️';
+        musicControl.title = 'Click to play music';
+      }
+    });
+  }
+
+  // Initialize animations and music
   createStars();
   startShootingStars();
+  setupMusic();
 });
 </script>
 
