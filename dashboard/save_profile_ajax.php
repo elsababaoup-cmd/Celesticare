@@ -3,77 +3,117 @@ session_start();
 include("../config/dbconfig.php");
 
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(["success" => false, "message" => "Not logged in"]);
+    echo json_encode(['success' => false, 'message' => 'Not authenticated']);
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
-$name = trim($_POST['name'] ?? '');
-$birthdate = trim($_POST['birthdate'] ?? '');
-$gender = trim($_POST['gender'] ?? '');
-$zodiac_sign = trim($_POST['zodiac_sign'] ?? '');
-
-// compute zodiac if needed
-function getZodiacSign($month, $day) {
-    $zodiacs = [
-        ["Capricorn", 1222, 119],
-        ["Aquarius", 120, 218],
-        ["Pisces", 219, 320],
-        ["Aries", 321, 419],
-        ["Taurus", 420, 520],
-        ["Gemini", 521, 620],
-        ["Cancer", 621, 722],
-        ["Leo", 723, 822],
-        ["Virgo", 823, 922],
-        ["Libra", 923, 1022],
-        ["Scorpio", 1023, 1121],
-        ["Sagittarius", 1122, 1221]
-    ];
-    $md = intval(sprintf("%02d%02d", $month, $day));
-    foreach ($zodiacs as [$sign, $start, $end]) {
-        if (($md >= $start && $md <= $end) || ($start > $end && ($md >= $start || $md <= $end))) {
-            return $sign;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'] ?? '';
+    $gender = $_POST['gender'] ?? '';
+    $birthdate = $_POST['birthdate'] ?? '';
+    $zodiac_sign = $_POST['zodiac_sign'] ?? '';
+    
+    $new_password = $_POST['new_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+    
+    try {
+        // Start transaction
+        $conn->begin_transaction();
+        
+        // Check if password change is requested
+        $password_changed = false;
+        if (!empty($new_password) && !empty($confirm_password)) {
+            // Simple password validation - no current password check
+            if ($new_password !== $confirm_password) {
+                throw new Exception("New passwords do not match");
+            }
+            
+            if (strlen($new_password) < 6) {
+                throw new Exception("New password must be at least 6 characters long");
+            }
+            
+            // Update password directly
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $pass_stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+            $pass_stmt->bind_param("si", $hashed_password, $user_id);
+            $pass_stmt->execute();
+            $pass_stmt->close();
+            
+            $password_changed = true;
         }
+        
+        // Update profile information
+        $update_fields = [];
+        $params = [];
+        $types = "";
+        
+        if (!empty($name)) {
+            $update_fields[] = "name = ?";
+            $params[] = $name;
+            $types .= "s";
+        }
+        
+        if (!empty($gender)) {
+            $update_fields[] = "gender = ?";
+            $params[] = $gender;
+            $types .= "s";
+        }
+        
+        if (!empty($birthdate)) {
+            $update_fields[] = "birthdate = ?";
+            $params[] = $birthdate;
+            $types .= "s";
+        }
+        
+        if (!empty($zodiac_sign)) {
+            $update_fields[] = "zodiac_sign = ?";
+            $params[] = $zodiac_sign;
+            $types .= "s";
+        }
+        
+        // Only update if there are fields to update
+        if (!empty($update_fields)) {
+            $sql = "UPDATE users SET " . implode(", ", $update_fields) . " WHERE id = ?";
+            $params[] = $user_id;
+            $types .= "i";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            
+            if ($stmt->error) {
+                throw new Exception("Database error: " . $stmt->error);
+            }
+            
+            $stmt->close();
+        }
+        
+        $conn->commit();
+        
+        // Return success response
+        $response = [
+            'success' => true,
+            'message' => $password_changed ? 'Profile and password updated successfully!' : 'Profile updated successfully!',
+            'data' => [
+                'name' => $name,
+                'gender' => $gender,
+                'birthdate' => $birthdate,
+                'zodiac_sign' => $zodiac_sign
+            ]
+        ];
+        
+        echo json_encode($response);
+        
+    } catch (Exception $e) {
+        $conn->rollback();
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
     }
-    return "Capricorn";
-}
-
-if (!empty($birthdate)) {
-    $date = date_create($birthdate);
-    $zodiac_sign = $zodiac_sign ?: getZodiacSign(date_format($date, "m"), date_format($date, "d"));
-}
-
-$update = $conn->prepare("UPDATE users SET name=?, birthdate=?, gender=?, zodiac_sign=? WHERE id=?");
-$update->bind_param("ssssi", $name, $birthdate, $gender, $zodiac_sign, $user_id);
-
-if ($update->execute()) {
-    $astroFacts = [
-        "Aries" => "You are bold, ambitious, and a natural leader.",
-        "Taurus" => "You value comfort and beauty in all things.",
-        "Gemini" => "Your curiosity and wit make you adaptable.",
-        "Cancer" => "You are intuitive and deeply caring.",
-        "Leo" => "Your creativity shines brightly.",
-        "Virgo" => "You find harmony in order and detail.",
-        "Libra" => "Balance and beauty guide your choices.",
-        "Scorpio" => "You’re magnetic and passionate.",
-        "Sagittarius" => "Your adventurous heart inspires others.",
-        "Capricorn" => "You are grounded and ambitious.",
-        "Aquarius" => "You think differently and value authenticity.",
-        "Pisces" => "Your creativity and empathy define you."
-    ];
-
-    echo json_encode([
-        "success" => true,
-        "data" => [
-            "name" => $name,
-            "birthdate" => $birthdate,
-            "gender" => $gender,
-            "zodiac_sign" => $zodiac_sign,
-            "astroFact" => $astroFacts[$zodiac_sign] ?? "Complete your zodiac profile to unlock your astro fact!"
-        ]
-    ]);
 } else {
-    echo json_encode(["success" => false, "message" => "DB error: ".$update->error]);
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
 }
 ?>

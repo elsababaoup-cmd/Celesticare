@@ -1,6 +1,5 @@
 <?php
 session_start();
-include("../includes/navbar.php");
 
 // ----------------------
 // 1. Make sure zodiac is set
@@ -20,9 +19,22 @@ if (isset($_GET['tone'])) {
     $_SESSION['undertone'] = $tone;
     setcookie("undertone", $tone, time() + (86400 * 30), "/"); // 30 days
 
+    // ✅ CRITICAL FIX: Save to database if user is logged in
+    if (isset($_SESSION['user_id'])) {
+        include(__DIR__ . "/../config/dbconfig.php");
+        $user_id = $_SESSION['user_id'];
+        $query = "UPDATE users SET undertone = ? WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("si", $tone, $user_id);
+        $stmt->execute();
+    }
+
     header("Location: undertone_result.php");
     exit();
 }
+
+// Only include navbar after potential redirects
+include("../includes/navbar.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -127,7 +139,7 @@ body::-webkit-scrollbar {
 
 <div class="quiz-box">
   <!-- Welcome instructions merged here -->
-  <h1>Let’s know your undertone</h1>
+  <h1>Let's know your undertone</h1>
   <p>Check the color of your veins on your wrist and click the image that best matches your skin tone.</p>
 
 

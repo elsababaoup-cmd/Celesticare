@@ -28,13 +28,25 @@ $undertone= $data['undertone']?? null;
 $season   = $data['season']   ?? null;
 
 // Basic validation
-if ($zodiac === null || $undertone === null) {
-    echo json_encode(["status"=>"error", "message"=>"Missing required fields (zodiac or undertone)", "received"=>$data]);
+if ($undertone === null) {
+    echo json_encode(["status"=>"error", "message"=>"Missing required field (undertone)", "received"=>$data]);
     exit;
 }
 
-// Use the actual column name in your DB: zodiac_sign
-$query = "UPDATE users SET zodiac_sign = ?, undertone = ?, season = ? WHERE id = ?";
+// ✅ CRITICAL FIX: Only update undertone and season, NOT zodiac_sign
+// ✅ Get current zodiac from database first to preserve it
+$check_query = "SELECT zodiac_sign FROM users WHERE id = ?";
+$check_stmt = $conn->prepare($check_query);
+$check_stmt->bind_param("i", $user_id);
+$check_stmt->execute();
+$result = $check_stmt->get_result();
+$user = $result->fetch_assoc();
+$check_stmt->close();
+
+// Use the actual zodiac from database, not from the request
+$current_zodiac = $user['zodiac_sign'] ?? $zodiac;
+
+$query = "UPDATE users SET undertone = ?, season = ? WHERE id = ?";
 $stmt = $conn->prepare($query);
 
 if (!$stmt) {
@@ -42,7 +54,7 @@ if (!$stmt) {
     exit;
 }
 
-$bind = $stmt->bind_param("sssi", $zodiac, $undertone, $season, $user_id);
+$bind = $stmt->bind_param("ssi", $undertone, $season, $user_id);
 if (!$bind) {
     echo json_encode(["status"=>"error", "message"=>"Bind failed", "error"=>$stmt->error]);
     exit;
@@ -62,6 +74,7 @@ echo json_encode([
     "message"=>"Update executed",
     "affected_rows"=>$affected,
     "payload"=>$data,
-    "user_id"=>$user_id
+    "user_id"=>$user_id,
+    "current_zodiac"=>$current_zodiac // For debugging
 ]);
 exit;

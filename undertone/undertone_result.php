@@ -2,9 +2,39 @@
 session_start();
 include("../includes/navbar.php");
 
-// Retrieve zodiac and undertone
-$zodiac = $_SESSION['zodiac_sign'] ?? $_COOKIE['zodiac_sign'] ?? null;
-$undertone = $_SESSION['undertone'] ?? $_COOKIE['undertone'] ?? null;
+// ✅ IMPROVED: Better zodiac and undertone retrieval
+$zodiac = null;
+$undertone = null;
+
+// For logged-in users, always check database first
+if (isset($_SESSION['user_id'])) {
+    include("../config/dbconfig.php");
+    $user_id = $_SESSION['user_id'];
+    $query = "SELECT zodiac_sign, undertone FROM users WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($user = $result->fetch_assoc()) {
+        // Prioritize database values over session/cookie
+        $zodiac = $user['zodiac_sign'] ?? null;
+        $undertone = $user['undertone'] ?? null;
+        
+        // Sync session with database to prevent future issues
+        if ($zodiac) $_SESSION['zodiac_sign'] = $zodiac;
+        if ($undertone) $_SESSION['undertone'] = $undertone;
+    }
+    $stmt->close();
+}
+
+// Fallback to session/cookie if still not set
+if (!$zodiac) {
+    $zodiac = $_SESSION['zodiac_sign'] ?? $_COOKIE['zodiac_sign'] ?? null;
+}
+if (!$undertone) {
+    $undertone = $_SESSION['undertone'] ?? $_COOKIE['undertone'] ?? null;
+}
 
 if (!$zodiac || !$undertone) {
     header("Location: undertone_test.php");
@@ -304,7 +334,7 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* forces perfect vertical center */
+  min-height: 120vh; /* forces perfect vertical center */
   margin: 0 auto;
 }
 
@@ -329,6 +359,7 @@ body.modal-open {
 }
 
 html::-webkit-scrollbar,
+.modal::-webkit-scrollbar,
 body::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
@@ -568,28 +599,26 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 })();
 
-// ✅ Get the PHP values from the server
-const zodiac = "<?= htmlspecialchars($zodiac) ?>";
-const undertone = "<?= htmlspecialchars($undertone) ?>";
-const season = "<?= htmlspecialchars($season ?? '') ?>"; // in case it's null
-
-// ✅ Only save if user is logged in and we have valid data
+// ✅ FIXED: Only save undertone data, not zodiac
 <?php if (isset($_SESSION['user_id'])): ?>
-if (zodiac && undertone) {
+const undertone = "<?= htmlspecialchars($undertone) ?>";
+const season = "<?= htmlspecialchars($season ?? '') ?>";
+
+if (undertone) {
   fetch("../user/save_color_data.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      zodiac: zodiac,
       undertone: undertone,
       season: season
+      // ✅ REMOVED zodiac from the payload to prevent overwriting
     })
   })
   .then(res => res.json())
   .then(data => {
-    console.log("✅ Save color response:", data);
+    console.log("✅ Save undertone response:", data);
   })
-  .catch(err => console.error("❌ Error saving color data:", err));
+  .catch(err => console.error("❌ Error saving undertone data:", err));
 }
 <?php endif; ?>
 </script>

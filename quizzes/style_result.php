@@ -103,108 +103,198 @@ $update_stmt->bind_param("si", $topStyle, $user_id);
 $update_stmt->execute();
 $update_stmt->close();
 
-// NEW APPROACH: Grid-based positioning with uniform layout
+// IMPROVED GRID-BASED POSITIONING - No circular pattern
+// CUSTOMIZED LAYOUT WITH PRIORITY FOR MAIN CLOTHING ITEMS
 function createItemLayout($items) {
     $layout = [];
-    $count = count($items);
     
-    // Categorize items
+    // Categorize items with priority
+    $dresses = [];
     $tops = [];
     $bottoms = [];
     $shoes = [];
     $accessories = [];
+    $outerwear = [];
     
     foreach ($items as $item) {
         $category = strtolower($item['category'] ?? '');
-        if (strpos($category, 'top') !== false || strpos($category, 'shirt') !== false || strpos($category, 'blouse') !== false) {
+        $itemName = strtolower($item['name'] ?? '');
+        
+        // Priority 1: Dresses (full outfits)
+        if (strpos($category, 'dress') !== false) {
+            $dresses[] = $item;
+        }
+        // Priority 2: Tops
+        elseif (strpos($category, 'top') !== false || strpos($category, 'shirt') !== false || 
+                strpos($category, 'blouse') !== false || strpos($category, 't-shirt') !== false ||
+                strpos($category, 'sweater') !== false) {
             $tops[] = $item;
-        } elseif (strpos($category, 'bottom') !== false || strpos($category, 'pant') !== false || strpos($category, 'skirt') !== false) {
+        }
+        // Priority 3: Bottoms
+        elseif (strpos($category, 'bottom') !== false || strpos($category, 'pant') !== false || 
+                strpos($category, 'skirt') !== false || strpos($category, 'jeans') !== false ||
+                strpos($category, 'trouser') !== false) {
             $bottoms[] = $item;
-        } elseif (strpos($category, 'shoe') !== false || strpos($category, 'footwear') !== false) {
+        }
+        // Priority 4: Outerwear
+        elseif (strpos($category, 'jacket') !== false || strpos($category, 'coat') !== false ||
+                strpos($category, 'blazer') !== false || strpos($category, 'outerwear') !== false) {
+            $outerwear[] = $item;
+        }
+        // Priority 5: Shoes
+        elseif (strpos($category, 'shoe') !== false || strpos($category, 'footwear') !== false ||
+                strpos($category, 'sneaker') !== false || strpos($category, 'boot') !== false) {
             $shoes[] = $item;
-        } else {
+        }
+        // Priority 6: Accessories (lowest priority)
+        else {
             $accessories[] = $item;
         }
     }
     
-    // Position tops and bottoms to avoid overlap
+    // MAIN CLOTHING POSITIONS - These get center stage and can overlay
+    $dressPositions = [];
+    foreach ($dresses as $index => $dress) {
+        // Dresses take center position with high z-index
+        $dressPositions[] = [
+            'x' => 0, 
+            'y' => 0, 
+            'rotation' => 0, 
+            'scale' => 0.9, 
+            'zIndex' => 100 + $index,
+            'type' => 'dress'
+        ];
+    }
+    
     $topPositions = [];
+    foreach ($tops as $index => $top) {
+        // Tops positioned slightly above center
+        $topPositions[] = [
+            'x' => 0, 
+            'y' => -0.1, 
+            'rotation' => 0, 
+            'scale' => 0.85, 
+            'zIndex' => 90 + $index,
+            'type' => 'top'
+        ];
+    }
+    
     $bottomPositions = [];
-    
-    if (count($tops) > 0) {
-        $topPositions = [
-            ['x' => 0, 'y' => -0.25, 'rotation' => 0, 'scale' => 0.9, 'zIndex' => 20]
+    foreach ($bottoms as $index => $bottom) {
+        // Bottoms positioned slightly below center
+        $bottomPositions[] = [
+            'x' => 0, 
+            'y' => 0.1, 
+            'rotation' => 0, 
+            'scale' => 0.85, 
+            'zIndex' => 80 + $index,
+            'type' => 'bottom'
         ];
     }
     
-    if (count($bottoms) > 0) {
-        $bottomPositions = [
-            ['x' => 0, 'y' => 0.15, 'rotation' => 0, 'scale' => 0.85, 'zIndex' => 10]
+    // SECONDARY ITEMS - Positioned around edges
+    $outerwearPositions = [];
+    foreach ($outerwear as $index => $item) {
+        $outerwearPositions[] = [
+            'x' => 0, 
+            'y' => 0, 
+            'rotation' => 0, 
+            'scale' => 0.95, 
+            'zIndex' => 70 + $index,
+            'type' => 'outerwear'
         ];
     }
     
-    // Position shoes at bottom
     $shoePositions = [];
     $shoeCount = count($shoes);
-    if ($shoeCount > 0) {
+    foreach ($shoes as $index => $shoe) {
         if ($shoeCount === 1) {
-            $shoePositions[] = ['x' => 0, 'y' => 0.35, 'rotation' => 0, 'scale' => 0.7, 'zIndex' => 5];
+            $shoePositions[] = ['x' => 0, 'y' => 0.25, 'rotation' => 0, 'scale' => 0.6, 'zIndex' => 60, 'type' => 'shoe'];
         } else {
-            $shoePositions[] = ['x' => -0.15, 'y' => 0.35, 'rotation' => -5, 'scale' => 0.65, 'zIndex' => 5];
-            $shoePositions[] = ['x' => 0.15, 'y' => 0.35, 'rotation' => 5, 'scale' => 0.65, 'zIndex' => 5];
+            $offset = ($index - ($shoeCount - 1) / 2) * 0.2;
+            $shoePositions[] = [
+                'x' => $offset, 
+                'y' => 0.25, 
+                'rotation' => $offset * 5, 
+                'scale' => 0.55, 
+                'zIndex' => 60 - $index,
+                'type' => 'shoe'
+            ];
         }
     }
     
-    // Position accessories around the edges
+    // ACCESSORIES - Positioned around edges with lower priority
     $accessoryPositions = [];
     $accessoryCount = count($accessories);
+    
     if ($accessoryCount > 0) {
-        $positions = [
-            ['x' => -0.3, 'y' => -0.3, 'rotation' => -8, 'scale' => 0.6, 'zIndex' => 30],
-            ['x' => 0.3, 'y' => -0.3, 'rotation' => 8, 'scale' => 0.6, 'zIndex' => 30],
-            ['x' => -0.35, 'y' => 0, 'rotation' => -12, 'scale' => 0.55, 'zIndex' => 25],
-            ['x' => 0.35, 'y' => 0, 'rotation' => 12, 'scale' => 0.55, 'zIndex' => 25],
-            ['x' => -0.25, 'y' => 0.3, 'rotation' => -5, 'scale' => 0.5, 'zIndex' => 15],
-            ['x' => 0.25, 'y' => 0.3, 'rotation' => 5, 'scale' => 0.5, 'zIndex' => 15]
+        // Expanded grid positions for accessories
+        $allPositions = [
+            // Top row
+            ['x' => -0.25, 'y' => -0.35, 'rotation' => -10, 'scale' => 0.5, 'zIndex' => 50, 'type' => 'accessory'],
+            ['x' => 0.25, 'y' => -0.35, 'rotation' => 10, 'scale' => 0.5, 'zIndex' => 50, 'type' => 'accessory'],
+            // Upper middle
+            ['x' => -0.35, 'y' => -0.15, 'rotation' => -15, 'scale' => 0.45, 'zIndex' => 49, 'type' => 'accessory'],
+            ['x' => 0.35, 'y' => -0.15, 'rotation' => 15, 'scale' => 0.45, 'zIndex' => 49, 'type' => 'accessory'],
+            // Lower middle
+            ['x' => -0.35, 'y' => 0.15, 'rotation' => -8, 'scale' => 0.4, 'zIndex' => 48, 'type' => 'accessory'],
+            ['x' => 0.35, 'y' => 0.15, 'rotation' => 8, 'scale' => 0.4, 'zIndex' => 48, 'type' => 'accessory'],
+            // Bottom row
+            ['x' => -0.25, 'y' => 0.35, 'rotation' => -5, 'scale' => 0.35, 'zIndex' => 47, 'type' => 'accessory'],
+            ['x' => 0.25, 'y' => 0.35, 'rotation' => 5, 'scale' => 0.35, 'zIndex' => 47, 'type' => 'accessory'],
+            // Outer corners
+            ['x' => -0.45, 'y' => -0.25, 'rotation' => -20, 'scale' => 0.3, 'zIndex' => 46, 'type' => 'accessory'],
+            ['x' => 0.45, 'y' => -0.25, 'rotation' => 20, 'scale' => 0.3, 'zIndex' => 46, 'type' => 'accessory'],
+            ['x' => -0.45, 'y' => 0.25, 'rotation' => -12, 'scale' => 0.3, 'zIndex' => 45, 'type' => 'accessory'],
+            ['x' => 0.45, 'y' => 0.25, 'rotation' => 12, 'scale' => 0.3, 'zIndex' => 45, 'type' => 'accessory']
         ];
         
-        for ($i = 0; $i < min($accessoryCount, count($positions)); $i++) {
-            $accessoryPositions[] = $positions[$i];
+        // Use available positions
+        for ($i = 0; $i < min($accessoryCount, count($allPositions)); $i++) {
+            $accessoryPositions[] = $allPositions[$i];
         }
     }
     
-    // Assign positions to items
-    $index = 0;
+    // ASSIGN POSITIONS WITH PRIORITY ORDER
+    // 1. Dresses (highest priority - can overlay everything)
+    foreach ($dresses as $index => $item) {
+        if (isset($dressPositions[$index])) {
+            $layout[] = array_merge(['item' => $item], $dressPositions[$index]);
+        }
+    }
     
-    // Assign tops
-    foreach ($tops as $top) {
+    // 2. Tops (high priority)
+    foreach ($tops as $index => $item) {
         if (isset($topPositions[$index])) {
-            $layout[] = array_merge(['item' => $top], $topPositions[$index]);
-            $index++;
+            $layout[] = array_merge(['item' => $item], $topPositions[$index]);
         }
     }
     
-    // Assign bottoms
-    foreach ($bottoms as $bottom) {
-        if (isset($bottomPositions[$index % count($bottomPositions)])) {
-            $layout[] = array_merge(['item' => $bottom], $bottomPositions[$index % count($bottomPositions)]);
-            $index++;
+    // 3. Bottoms (high priority)
+    foreach ($bottoms as $index => $item) {
+        if (isset($bottomPositions[$index])) {
+            $layout[] = array_merge(['item' => $item], $bottomPositions[$index]);
         }
     }
     
-    // Assign shoes
-    foreach ($shoes as $shoe) {
-        if (isset($shoePositions[$index % count($shoePositions)])) {
-            $layout[] = array_merge(['item' => $shoe], $shoePositions[$index % count($shoePositions)]);
-            $index++;
+    // 4. Outerwear
+    foreach ($outerwear as $index => $item) {
+        if (isset($outerwearPositions[$index])) {
+            $layout[] = array_merge(['item' => $item], $outerwearPositions[$index]);
         }
     }
     
-    // Assign accessories
-    foreach ($accessories as $accessory) {
-        if (isset($accessoryPositions[$index % count($accessoryPositions)])) {
-            $layout[] = array_merge(['item' => $accessory], $accessoryPositions[$index % count($accessoryPositions)]);
-            $index++;
+    // 5. Shoes
+    foreach ($shoes as $index => $item) {
+        if (isset($shoePositions[$index])) {
+            $layout[] = array_merge(['item' => $item], $shoePositions[$index]);
+        }
+    }
+    
+    // 6. Accessories (lowest priority - will be behind main items if they overlap)
+    foreach ($accessories as $index => $item) {
+        if (isset($accessoryPositions[$index])) {
+            $layout[] = array_merge(['item' => $item], $accessoryPositions[$index]);
         }
     }
     
@@ -282,13 +372,12 @@ $itemLayout = createItemLayout($outfit);
             max-height: 700px;
             position: relative;
             background: 
-                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, transparent 70%),
-                linear-gradient(135deg, rgba(248,240,255,0.4) 0%, transparent 50%);
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, transparent 70%),
+                linear-gradient(135deg, rgba(248, 240, 255, 0) 0%, transparent 50%);
             border-radius: var(--border-radius);
-            border: 2px solid rgba(255, 255, 255, 0.5);
             box-shadow: 
                 inset 0 2px 10px rgba(255,255,255,0.6),
-                0 8px 32px rgba(0,0,0,0.1);
+                0 8px 32px rgba(0, 0, 0, 0);
         }
 
         .items-container {
@@ -302,30 +391,35 @@ $itemLayout = createItemLayout($outfit);
             justify-content: center;
         }
 
-        .style-item {
-            position: absolute;
-            width: var(--item-size, 70%);
-            height: var(--item-size, 70%);
-            border-radius: 12px;
-            box-shadow: 
-                0 12px 40px rgba(0,0,0,0.15),
-                0 6px 20px rgba(0,0,0,0.1),
-                0 3px 10px rgba(0,0,0,0.05);
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            object-fit: contain;
-            cursor: pointer;
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            background: rgba(155, 155, 155, 0.54);
-            backdrop-filter: blur(5px);
-            transform-origin: center center;
-        }
+    .style-item {
+        position: absolute;
+        border-radius: 12px;
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.35),
+            0 6px 20px rgba(0,0,0,0.35.1),
+            0 3px 10px rgba(0,0,0,0.0.35);
+        transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        object-fit: contain;
+        cursor: pointer;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        background: rgba(92, 92, 92, 0);
+        backdrop-filter: blur(5px);
+        transform-origin: center center;
+        
+        /* Dynamic sizing based on item type */
+        width: auto;
+        height: auto;
+        max-width: var(--item-max-width, 80%);
+        max-height: var(--item-max-height, 80%);
+    }
 
         .style-item:hover {
             transform: scale(1.2) rotate(0deg) !important;
             z-index: 1000 !important;
+            background: rgba(40, 40, 40, 0.66);
             box-shadow: 
-                0 20px 60px rgba(0,0,0,0.25),
-                0 12px 40px rgba(0,0,0,0.15);
+                0 20px 60px rgba(255, 255, 255, 1),
+                0 12px 40px rgba(255, 255, 255, 1);
             border-color: rgba(255, 255, 255, 1);
         }
 
@@ -488,6 +582,13 @@ $itemLayout = createItemLayout($outfit);
             
             .action-buttons {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .style-item {
+                min-width: 60px;
+                min-height: 60px;
             }
         }
 

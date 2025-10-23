@@ -24,32 +24,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $user['username'];
             $_SESSION['email'] = $user['email'];
 
-            // ✅ Sync unsaved session data (from Get To Know You or color analysis)
-            $name = $_SESSION['name'] ?? $user['name'];
-            $birthdate = $_SESSION['birthdate'] ?? $user['birthdate'];
-            $gender = $_SESSION['gender'] ?? $user['gender'];
-            $zodiac_sign = $_SESSION['zodiac_sign'] ?? $user['zodiac_sign'];
-            $undertone = $_SESSION['undertone'] ?? $user['undertone'];
-            $season = $_SESSION['season'] ?? $user['season'];
+            // ✅ CRITICAL FIX: Check if we have NEW session data from "Get to Know You"
+            $hasNewSessionData = !empty($_SESSION['zodiac_sign']) || !empty($_SESSION['name']) || !empty($_SESSION['birthdate']);
 
-            // ✅ Update the DB with any missing info
-            $update = $conn->prepare("UPDATE users SET name=?, birthdate=?, gender=?, zodiac_sign=?, undertone=?, season=? WHERE id=?");
-            $update->bind_param("ssssssi", $name, $birthdate, $gender, $zodiac_sign, $undertone, $season, $user['id']);
-            $update->execute();
+            if ($hasNewSessionData) {
+                // ✅ USER HAS NEW DATA: Update database with session data
+                $name = $_SESSION['name'] ?? $user['name'];
+                $birthdate = $_SESSION['birthdate'] ?? $user['birthdate'];
+                $gender = $_SESSION['gender'] ?? $user['gender'];
+                $zodiac_sign = $_SESSION['zodiac_sign'] ?? $user['zodiac_sign'];
+                $undertone = $_SESSION['undertone'] ?? $user['undertone'];
+                $season = $_SESSION['season'] ?? $user['season'];
 
-            // ✅ Fetch updated user record
-            $refresh = $conn->prepare("SELECT * FROM users WHERE id = ?");
-            $refresh->bind_param("i", $user['id']);
-            $refresh->execute();
-            $freshUser = $refresh->get_result()->fetch_assoc();
+                $update = $conn->prepare("UPDATE users SET name=?, birthdate=?, gender=?, zodiac_sign=?, undertone=?, season=? WHERE id=?");
+                $update->bind_param("ssssssi", $name, $birthdate, $gender, $zodiac_sign, $undertone, $season, $user['id']);
+                $update->execute();
 
-            // ✅ Update session again with latest DB values
-            $_SESSION['name'] = $freshUser['name'] ?? '';
-            $_SESSION['birthdate'] = $freshUser['birthdate'] ?? '';
-            $_SESSION['gender'] = $freshUser['gender'] ?? '';
-            $_SESSION['zodiac_sign'] = $freshUser['zodiac_sign'] ?? '';
-            $_SESSION['undertone'] = $freshUser['undertone'] ?? '';
-            $_SESSION['season'] = $freshUser['season'] ?? '';
+                // ✅ Keep the NEW session data (don't overwrite with old DB data)
+                // Session already has the new data, so we don't need to change it
+
+            } else {
+                // ✅ USER HAS NO NEW DATA: Restore from database
+                if (!empty($user['zodiac_sign'])) {
+                    $_SESSION['zodiac_sign'] = $user['zodiac_sign'];
+                    setcookie('zodiac_sign', $user['zodiac_sign'], time() + (86400 * 30), "/");
+                }
+                
+                if (!empty($user['undertone'])) {
+                    $_SESSION['undertone'] = $user['undertone'];
+                    setcookie('undertone', $user['undertone'], time() + (86400 * 30), "/");
+                }
+                
+                if (!empty($user['season'])) {
+                    $_SESSION['season'] = $user['season'];
+                }
+
+                // Restore basic profile data
+                $_SESSION['name'] = $user['name'] ?? '';
+                $_SESSION['birthdate'] = $user['birthdate'] ?? '';
+                $_SESSION['gender'] = $user['gender'] ?? '';
+            }
 
             // ✅ Sync color data if exists
             echo "

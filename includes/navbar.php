@@ -1,11 +1,41 @@
 <?php
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 $BASE = '/celesticare';
+
+// ✅ ADD THIS: Restore user data from database if logged in
+if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
+    include(__DIR__ . "/../config/dbconfig.php");
+    $user_id = $_SESSION['user_id'];
+    
+    $query = "SELECT zodiac_sign, undertone, season FROM users WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($user = $result->fetch_assoc()) {
+        // Restore missing session data from database
+        if (empty($_SESSION['zodiac_sign']) && !empty($user['zodiac_sign'])) {
+            $_SESSION['zodiac_sign'] = $user['zodiac_sign'];
+            setcookie('zodiac_sign', $user['zodiac_sign'], time() + (86400 * 30), "/");
+        }
+        
+        if (empty($_SESSION['undertone']) && !empty($user['undertone'])) {
+            $_SESSION['undertone'] = $user['undertone'];
+            setcookie('undertone', $user['undertone'], time() + (86400 * 30), "/");
+        }
+        
+        if (empty($_SESSION['season']) && !empty($user['season'])) {
+            $_SESSION['season'] = $user['season'];
+        }
+    }
+}
 ?>
+
+<!-- Rest of your existing navbar code remains the same -->
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,6 +47,7 @@ $BASE = '/celesticare';
     padding: 15px 60px;
     font-family: 'Poppins', sans-serif;
     border-bottom: 1px solid #eee;
+    min-height: 80px; /* Fixed navbar height */
   }
 
   .navbar-brand {
@@ -28,6 +59,17 @@ $BASE = '/celesticare';
     text-transform: uppercase !important;
     padding: 10px 20px !important;
     border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    height: 60px !important; /* Fixed brand height */
+  }
+
+  .navbar-logo {
+    height: 80px; /* You can adjust this without affecting navbar sizing */
+    width: auto;
+    object-fit: contain;
+    max-height: 80px; /* Prevents overflow */
   }
 
   .navbar-nav .nav-link {
@@ -79,10 +121,12 @@ $BASE = '/celesticare';
   @media (max-width: 991px) {
     nav.navbar {
       padding: 15px 20px;
+      min-height: 70px; /* Fixed mobile navbar height */
     }
     
     .navbar-brand {
-      font-size: 2rem !important;
+      font-size: 1.8rem !important;
+      height: 50px !important; /* Fixed mobile brand height */
     }
     
     .navbar-nav .nav-link {
@@ -94,12 +138,20 @@ $BASE = '/celesticare';
       margin-bottom: 0;
       margin-right: 8px;
     }
+
+    .navbar-logo {
+      height: 35px; /* Adjust for mobile if needed */
+      max-height: 40px; /* Prevents mobile overflow */
+    }
   }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="<?= $BASE ?>/index.php">CELESTICARE</a>
+    <a class="navbar-brand" href="<?= $BASE ?>/index.php">
+      <img src="<?= $BASE ?>/includes/logo1.png" alt="CelestiCare Logo" class="navbar-logo">
+      CELESTICARE
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>

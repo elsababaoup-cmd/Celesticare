@@ -1,15 +1,18 @@
 <?php
-// Start output buffering at the VERY top
-ob_start();
 session_start();
-
 include("../config/dbconfig.php");
-include(__DIR__ . "/../includes/navbar.php");
-$message = "";
 
-// ✅ ADMIN CONFIGURATION
+// If already logged in as admin, redirect to manage users
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header("Location: manage_users.php");
+    exit();
+}
+
+// Admin configuration
 define('ADMIN_EMAIL_DOMAIN', '@celesticare.admin.com');
-define('ADMIN_SECRET_KEY', 'CelestiCare2025!'); // Change this to your secure admin password
+define('ADMIN_SECRET_KEY', 'CelestiCare2025!');
+
+$message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
@@ -18,73 +21,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($email) || empty($password)) {
         $message = "<div class='alert alert-danger text-center'>Both fields are required.</div>";
     } else {
-        // ✅ Check if it's an admin login attempt
+        // Check if it's an admin email
         $is_admin_email = (strpos($email, ADMIN_EMAIL_DOMAIN) !== false);
         
-        if ($is_admin_email) {
-            // Admin login logic
-            if ($password === ADMIN_SECRET_KEY) {
-                // Verify admin email exists in database
-                $query = "SELECT * FROM users WHERE email = ? AND email LIKE '%" . ADMIN_EMAIL_DOMAIN . "'";
-                $stmt = mysqli_prepare($conn, $query);
-                mysqli_stmt_bind_param($stmt, "s", $email);
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
-
-                if ($user = mysqli_fetch_assoc($result)) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['is_admin'] = true;
-                    $_SESSION['admin_email'] = $email;
-                    $_SESSION['admin_logged_in'] = true;
-                    $_SESSION['admin_id'] = $user['id'];
-                    
-                    // Clear the buffer before redirect
-                    ob_end_clean();
-                    header("Location: ../admin/manage_users.php");
-                    exit();
-                } else {
-                    $message = "<div class='alert alert-danger text-center'>Admin email not found in system.</div>";
-                }
-            } else {
-                $message = "<div class='alert alert-danger text-center'>Invalid admin credentials.</div>";
-            }
-        } else {
-            // Regular user login logic (your existing code)
-            $query = "SELECT * FROM users WHERE email = ?";
+        if ($is_admin_email && $password === ADMIN_SECRET_KEY) {
+            // Verify admin email exists in database
+            $query = "SELECT * FROM users WHERE email = ? AND email LIKE '%" . ADMIN_EMAIL_DOMAIN . "'";
             $stmt = mysqli_prepare($conn, $query);
             mysqli_stmt_bind_param($stmt, "s", $email);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
 
             if ($user = mysqli_fetch_assoc($result)) {
-                if (password_verify($password, $user['password'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['is_admin'] = false;
-                    
-                    // Clear the buffer before redirect
-                    ob_end_clean();
-                    header("Location: ../dashboard/index.php");
-                    exit();
-                } else {
-                    $message = "<div class='alert alert-danger text-center'>Invalid password.</div>";
-                }
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['is_admin'] = true;
+                $_SESSION['admin_email'] = $email;
+                $_SESSION['admin_logged_in'] = true;
+                $_SESSION['admin_id'] = $user['id'];
+                
+                header("Location: manage_users.php");
+                exit();
             } else {
-                $message = "<div class='alert alert-danger text-center'>No account found with that email.</div>";
+                $message = "<div class='alert alert-danger text-center'>Admin email not found in system.</div>";
             }
+        } else {
+            $message = "<div class='alert alert-danger text-center'>Invalid admin credentials.</div>";
         }
     }
 }
-
-// If we reach here, output the buffered content
-ob_end_flush();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - CelestiCare</title>
+    <title>Admin Login - CelestiCare</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html, body {
@@ -158,7 +130,7 @@ ob_end_flush();
             font-size: 24px;
             letter-spacing: 1px;
             text-align: center;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .text-muted {
@@ -173,33 +145,41 @@ ob_end_flush();
         .text-muted a:hover {
             color: #d3bfff !important;
         }
+
+        .admin-badge {
+            background: #6b5b95;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
 
 <div class="login-container">
     <div class="login-box">
-        <div class="brand-title">CELESTICARE</div>
-        <h2>Log in to your CelestiCare profile</h2>
+        <div class="brand-title">CELESTICARE <span class="admin-badge">ADMIN</span></div>
+        <h2>Admin Access - CelestiCare</h2>
         <?php if (!empty($message)) echo $message; ?>
-        <?php if (isset($_GET['registered'])): ?>
-            <div class="alert alert-success text-center">Registration successful! Please login.</div>
-        <?php endif; ?>
 
         <form method="POST" action="">
             <div class="mb-3">
-                <input type="email" name="email" class="form-control" placeholder="Email" required>
+                <input type="email" name="email" class="form-control" placeholder="Admin Email" required>
             </div>
             <div class="mb-3">
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
+                <input type="password" name="password" class="form-control" placeholder="Admin Key" required>
             </div>
-            <button type="submit" class="btn btn-login">Login</button>
+            <button type="submit" class="btn btn-login">Access Admin Panel</button>
             <p class="text-center text-muted mt-3">
-                Don't have a CelestiCare profile? <a href="register.php">Sign up</a>
+                <a href="../auth/login.php">← Back to User Login</a>
             </p>
         </form>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

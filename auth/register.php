@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 include("../config/dbconfig.php");
 include(__DIR__ . "/../includes/navbar.php");
 $message = "";
@@ -25,6 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $query = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
             if (mysqli_query($conn, $query)) {
+                ob_end_clean(); // Clear the buffer before redirect
                 header("Location: login.php?registered=1");
                 exit();
             } else {

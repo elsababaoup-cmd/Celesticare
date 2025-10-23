@@ -295,13 +295,18 @@ h2 { color: #6a1b9a; font-weight: 600; }
     gap: 20px;
     margin-top: 30px;
 }
-.color-wheel { 
-    max-width: 150px; 
-    display: block; 
-    margin: 0 auto 10px;
+.color-wheel {
+    max-width: 220px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
     border-radius: 50%;
     border: 3px solid #fff;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    
+    /* Add these for better control */
+    object-fit: cover;
+    transition: all 0.3s ease;
 }
 .aesthetic-image {
     width: 100%;
@@ -794,31 +799,28 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
                 </div>
             </div>
 
-            <!-- 🎨 Color Analysis -->
+            <!-- 🎨 Color Analysis - SIMPLE VERSION -->
             <div class="color-section">
-                <div class="section-title mb-2">Color Analysis</div>
-                <p><strong>Zodiac:</strong> <span id="displayZodiacColor"><?= $zodiac ?></span></p>
-                <p><strong>Undertone:</strong> <span id="displayUndertone"><?= $undertone ?></span></p>
-                <p><strong>Season:</strong> <span id="displaySeason"><?= $season ?></span></p>
-
-                <div id="colorWheelContainer" class="mt-3 text-center">
-                    <?php if ($undertone && $undertone !== 'Not set'): ?>
+                <div class="section-title mb-3">Color Analysis</div>
+                
+                <div class="mb-3">
+                    <p class="mb-1"><strong>Zodiac:</strong> <?= $zodiac ?></p>
+                    <p class="mb-1"><strong>Undertone:</strong> <?= $undertone ?></p>
+                    <p class="mb-1"><strong>Season:</strong> <?= $season ?></p>
+                </div>
+                
+                <?php if ($undertone && $undertone !== 'Not set'): ?>
+                    <div class="text-center mb-3">
                         <?php
                         $undertone_lower = strtolower($undertone);
                         $image_path = $base_path . $undertone_lower . "_wheel.png";
-                        $fallback_path = $base_path . "default_wheel.png";
                         ?>
                         <img src="<?= $image_path ?>" 
-                             alt="<?= $undertone ?> color wheel" 
-                             class="color-wheel"
-                             onerror="this.src='<?= $fallback_path ?>'; this.onerror=null;">
-                    <?php else: ?>
-                        <p class="text-muted">Complete color analysis to see your color wheel</p>
-                    <?php endif; ?>
-                </div>
-                
-                <div id="colorPaletteContainer" class="mt-3 d-flex justify-content-center gap-2 flex-wrap">
-                    <?php if ($undertone && $undertone !== 'Not set'): ?>
+                            alt="<?= $undertone ?> color wheel" 
+                            class="color-wheel">
+                    </div>
+                    
+                    <div class="text-center mb-3">
                         <?php
                         $palettes = [
                             "Warm" => ["#E69A5B", "#F5C16C", "#D76A03", "#C25B02", "#FFD27F"],
@@ -828,17 +830,20 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
                         
                         if (isset($palettes[$undertone])) {
                             foreach ($palettes[$undertone] as $color) {
-                                echo '<div class="color-swatch" style="background: ' . $color . '" title="' . $color . '"></div>';
+                                echo '<div class="color-swatch d-inline-block" style="background: ' . $color . '"></div>';
                             }
                         }
                         ?>
-                    <?php endif; ?>
-                </div>
-
-                <?php if ($undertone && $undertone !== 'Not set'): ?>
-                    <a id="analyzeBtn" href="../undertone/undertone_result.php" class="btn-style">View Full Analysis</a>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="../undertone/undertone_result.php" class="btn-style">View Full Analysis</a>
+                    </div>
                 <?php else: ?>
-                    <a id="analyzeBtn" href="../setup/get_to_know.php" class="btn-style">I want to know!</a>
+                    <div class="text-center py-3">
+                        <p class="text-muted mb-3">Complete color analysis to see your personal color palette</p>
+                        <a href="../setup/get_to_know.php" class="btn-style">I want to know!</a>
+                    </div>
                 <?php endif; ?>
             </div>
 
@@ -1006,32 +1011,82 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
 
 <!-- Edit Profile Modal -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background-color: #2e2e2e; color: #ffffff; border-radius: 20px; border: none;">
             <div class="modal-header border-0">
-                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                <h5 class="modal-title" style="color: #ffffff;">Edit Profile</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="editProfileForm">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="name" name="name" value="<?= $name ?>" placeholder="Enter your full name">
+                    <!-- Basic Information -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: #6b5b95;"><i class="fas fa-user"></i> Basic Information</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label" style="color: #cfcfcf;">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" value="<?= $name ?>" 
+                                       placeholder="Enter your full name"
+                                       style="background-color: #4b4b4b; border: none; color: #fff; border-radius: 30px; padding: 12px 20px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label" style="color: #cfcfcf;">Gender</label>
+                                <select class="form-control" id="gender" name="gender"
+                                        style="background-color: #4b4b4b; border: none; color: #fff; border-radius: 30px; padding: 12px 20px;">
+                                    <option value="">Select Gender</option>
+                                    <option value="Masculine" <?= $gender == 'Masculine' ? 'selected' : '' ?>>Masculine</option>
+                                    <option value="Feminine" <?= $gender == 'Feminine' ? 'selected' : '' ?>>Feminine</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="birthdate" class="form-label" style="color: #cfcfcf;">Date of Birth</label>
+                                <input type="date" class="form-control" id="birthdate" name="birthdate" value="<?= $birthdate ?>"
+                                       style="background-color: #4b4b4b; border: none; color: #fff; border-radius: 30px; padding: 12px 20px;">
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="gender" class="form-label">Gender</label>
-                        <select class="form-control" id="gender" name="gender">
-                            <option value="">Select Gender</option>
-                            <option value="Masculine" <?= $gender == 'Masculine' ? 'selected' : '' ?>>Male</option>
-                            <option value="Feminine" <?= $gender == 'Feminine' ? 'selected' : '' ?>>Female</option>
-                        </select>
+
+                    <!-- Password Change Section -->
+                    <div class="mb-4">
+                        <h6 class="mb-3" style="color: #6b5b95;"><i class="fas fa-lock"></i> Change Password</h6>
+                        <div class="alert alert-dark mb-3" style="background-color: #4b4b4b; border: none; color: #cfcfcf; border-radius: 15px;">
+                            <small><i class="fas fa-info-circle"></i> Leave password fields blank if you don't want to change your password.</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="current_password" class="form-label" style="color: #cfcfcf;">Current Password</label>
+                                <input type="password" class="form-control" id="current_password" name="current_password" 
+                                       placeholder="Enter current password"
+                                       style="background-color: #4b4b4b; border: none; color: #fff; border-radius: 30px; padding: 12px 20px;">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="new_password" class="form-label" style="color: #cfcfcf;">New Password</label>
+                                <input type="password" class="form-control" id="new_password" name="new_password" 
+                                       placeholder="Enter new password"
+                                       style="background-color: #4b4b4b; border: none; color: #fff; border-radius: 30px; padding: 12px 20px;">
+                                <div class="form-text" style="color: #8c77c5; padding-left: 15px;">Must be at least 6 characters long</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirm_password" class="form-label" style="color: #cfcfcf;">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                                       placeholder="Confirm new password"
+                                       style="background-color: #4b4b4b; border: none; color: #fff; border-radius: 30px; padding: 12px 20px;">
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="birthdate" class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control" id="birthdate" name="birthdate" value="<?= $birthdate ?>">
-                    </div>
+
                     <input type="hidden" id="zodiac_sign" name="zodiac_sign" value="<?= $zodiac ?>">
-                    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                    
+                    <button type="submit" class="btn mt-3 w-100" 
+                            style="background-color: #6b5b95; color: #fff; border: none; border-radius: 30px; padding: 12px 20px; transition: 0.3s;"
+                            onmouseover="this.style.backgroundColor='#8c77c5'" 
+                            onmouseout="this.style.backgroundColor='#6b5b95'">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
                 </form>
             </div>
         </div>
@@ -1077,42 +1132,247 @@ document.getElementById("birthdate").addEventListener("change", function() {
   }
 });
 
-// 💾 Save via AJAX
+// 💾 Save via AJAX with better error handling
 document.getElementById("editProfileForm").addEventListener("submit", async function(e) {
   e.preventDefault();
   const formData = new FormData(this);
+  const submitButton = this.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  
+  // Show loading state
+  submitButton.textContent = 'Saving...';
+  submitButton.disabled = true;
   
   try {
     const response = await fetch("save_profile_ajax.php", { 
       method: "POST", 
       body: formData 
     });
-    const result = await response.json();
-
+    
+    let result;
+    
+    // Try to parse JSON response
+    try {
+      result = await response.json();
+    } catch (jsonError) {
+      console.error('JSON parse error:', jsonError);
+      throw new Error('Invalid response from server');
+    }
+    
     if (result.success) {
-      // Update displayed values
-      document.getElementById("displayName").textContent = result.data.name || "Not set";
-      document.getElementById("displayGender").textContent = result.data.gender || "Not set";
-      document.getElementById("displayBirthdate").textContent = result.data.birthdate || "Not set";
-      document.getElementById("displayZodiac").textContent = result.data.zodiac_sign || "Not set";
-      document.getElementById("displayZodiacColor").textContent = result.data.zodiac_sign || "Not set";
-      
-      const modal = bootstrap.Modal.getInstance(document.getElementById("editProfileModal"));
-      modal.hide();
-      
-      // Reload the page to update all sections
-      setTimeout(() => {
-        location.reload();
-      }, 1000);
-      
+        // Update displayed values immediately
+        if (result.data) {
+            document.getElementById("displayName").textContent = result.data.name || "Not set";
+            document.getElementById("displayGender").textContent = result.data.gender || "Not set";
+            document.getElementById("displayBirthdate").textContent = result.data.birthdate || "Not set";
+            document.getElementById("displayZodiac").textContent = result.data.zodiac_sign || "Not set";
+        }
+        
+        // Show success message
+        showAlert('Profile updated successfully!', 'success');
+        
+        // Close modal after a short delay
+        setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById("editProfileModal"));
+            modal.hide();
+            
+            // ✅ Reload to ensure everything is synchronized
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }, 1500);
+        
     } else {
-      alert("Error: " + (result.message || "Failed to update profile"));
+        // Show specific error message from server
+        const errorMsg = result.message || "Failed to update profile";
+        showAlert('Error: ' + errorMsg, 'error');
+        console.error('Server error:', result);
     }
   } catch (error) {
-    console.error("Error:", error);
-    alert("An error occurred while updating your profile.");
+    console.error("Network error:", error);
+    showAlert('Network error: ' + error.message, 'error');
+  } finally {
+    // Restore button state
+    submitButton.textContent = originalText;
+    submitButton.disabled = false;
   }
 });
+
+// Helper function to show alerts with theme styling
+function showAlert(message, type) {
+  // Remove any existing alerts
+  const existingAlert = document.querySelector('.custom-alert');
+  if (existingAlert) {
+    existingAlert.remove();
+  }
+  
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `custom-alert alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+  alertDiv.style.cssText = `
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: none;
+    border-radius: 15px;
+    color: ${type === 'success' ? '#155724' : '#721c24'};
+    background-color: ${type === 'success' ? '#d4edda' : '#f8d7da'};
+  `;
+  alertDiv.textContent = message;
+  
+  document.body.appendChild(alertDiv);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    alertDiv.remove();
+  }, 5000);
+}
+
+// Password validation with matching styling
+// Password validation
+function validatePassword() {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    const currentPassword = document.getElementById('current_password').value;
+    
+    // If any password field is filled, all must be filled
+    if (newPassword || confirmPassword || currentPassword) {
+        if (!currentPassword) {
+            showAlert('Current password is required to change password', 'error');
+            return false;
+        }
+        if (!newPassword) {
+            showAlert('New password is required', 'error');
+            return false;
+        }
+        if (!confirmPassword) {
+            showAlert('Please confirm your new password', 'error');
+            return false;
+        }
+        if (newPassword !== confirmPassword) {
+            showAlert('New passwords do not match', 'error');
+            return false;
+        }
+        if (newPassword.length < 6) {
+            showAlert('New password must be at least 6 characters long', 'error');
+            return false;
+        }
+    }
+    return true;
+}
+
+// Real-time password matching indicator
+document.getElementById('confirm_password').addEventListener('input', function() {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = this.value;
+    
+    if (confirmPassword && newPassword) {
+        if (newPassword === confirmPassword) {
+            this.style.border = '2px solid #28a745';
+            this.style.boxShadow = '0 0 0 0.2rem rgba(40, 167, 69, 0.25)';
+        } else {
+            this.style.border = '2px solid #dc3545';
+            this.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+        }
+    } else {
+        this.style.border = 'none';
+        this.style.boxShadow = 'none';
+    }
+});
+
+// Add focus effects to match login style
+document.querySelectorAll('#editProfileForm .form-control').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.style.border = '2px solid #6b5b95';
+        this.style.boxShadow = '0 0 0 0.2rem rgba(107, 91, 149, 0.25)';
+    });
+    
+    input.addEventListener('blur', function() {
+        this.style.border = 'none';
+        this.style.boxShadow = 'none';
+    });
+});
+
+// Update form submission to include password validation START
+// 💾 Save via AJAX with password support
+document.getElementById("editProfileForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  if (!validatePassword()) {
+  return;
+  }
+  
+  const formData = new FormData(this);
+  const submitButton = this.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  
+  // Show loading state
+  submitButton.textContent = 'Saving...';
+  submitButton.disabled = true;
+  submitButton.style.backgroundColor = '#8c77c5';
+  
+  try {
+    const response = await fetch("save_profile_ajax.php", { 
+      method: "POST", 
+      body: formData 
+    });
+    
+    const responseText = await response.text();
+    console.log("Server Response:", responseText);
+    
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (e) {
+      console.error("JSON Parse Error:", e, "Response:", responseText);
+      showAlert('Server error: Invalid response format', 'error');
+      return;
+    }
+    
+    console.log("Parsed Result:", result);
+    
+    // Check for success
+    if (result.success === true) {
+      // Update displayed values
+      if (result.data) {
+        document.getElementById("displayName").textContent = result.data.name || "Not set";
+        document.getElementById("displayGender").textContent = result.data.gender || "Not set";
+        document.getElementById("displayBirthdate").textContent = result.data.birthdate || "Not set";
+        document.getElementById("displayZodiac").textContent = result.data.zodiac_sign || "Not set";
+      }
+      
+      // Show success message
+      showAlert(result.message, 'success');
+      
+      // Clear password fields
+      document.getElementById('current_password').value = '';
+      document.getElementById('new_password').value = '';
+      document.getElementById('confirm_password').value = '';
+      
+      // Close modal after delay
+      setTimeout(() => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById("editProfileModal"));
+        if (modal) modal.hide();
+      }, 1500);
+      
+    } else {
+      // Show error message
+      showAlert(result.message, 'error');
+    }
+    
+  } catch (error) {
+    console.error("Network error:", error);
+    showAlert('Network error: ' + error.message, 'error');
+  } finally {
+    // Restore button state
+    submitButton.textContent = originalText;
+    submitButton.disabled = false;
+    submitButton.style.backgroundColor = '#6b5b95';
+  }
+});
+
+// Also make sure your save_profile_ajax.php file is returning proper JSON
 </script>
 </body>
 </html>

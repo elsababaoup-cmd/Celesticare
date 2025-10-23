@@ -1,15 +1,10 @@
 <?php
 session_start();
-include(__DIR__ . "/../includes/navbar.php");
-include(__DIR__ . "/../config/dbconfig.php"); // ✅ For DB updates
 
-// Optional: pre-fill form if user already entered details
-$name = $_SESSION['name'] ?? '';
-$birthdate = $_SESSION['birthdate'] ?? '';
-$gender = $_SESSION['gender'] ?? '';
-
-// ✅ Handle form submission
+// ✅ Handle form submission BEFORE any HTML output
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    include(__DIR__ . "/../config/dbconfig.php"); // ✅ For DB updates
+
     $name = trim($_POST['name']);
     $birthdate = trim($_POST['birthdate']);
     $gender = trim($_POST['gender']);
@@ -39,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $_SESSION['zodiac_sign'] = $zodiac_sign;
 
-    // ✅ Save to DB only if user is logged in
+    // ✅ CRITICAL: If user is logged in, save to database IMMEDIATELY
     if (isset($_SESSION['user_id'])) {
         $user_id = $_SESSION['user_id'];
         $query = "UPDATE users SET name = ?, birthdate = ?, gender = ?, zodiac_sign = ? WHERE id = ?";
@@ -52,6 +47,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header("Location: ../zodiac/zodiac_result.php");
     exit();
 }
+
+// Optional: pre-fill form if user already entered details (AFTER potential redirect)
+$name = $_SESSION['name'] ?? '';
+$birthdate = $_SESSION['birthdate'] ?? '';
+$gender = $_SESSION['gender'] ?? '';
+
+// Now include navbar and output HTML
+include(__DIR__ . "/../includes/navbar.php");
 ?>
 
 <!DOCTYPE html>

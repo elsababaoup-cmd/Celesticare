@@ -690,7 +690,7 @@ include(__DIR__ . "/includes/navbar.php");
         <div class="cta-content">
           <h2>Ready to Transform Your Style?</h2>
           <p>Join thousands of fashion-forward individuals who use astrology to enhance their personal style.</p>
-          <a href="./auth/register.php" class="btn cta-btn">Sign In to Your Account</a>
+          <a href="./auth/signin.php" class="btn cta-btn">Sign In to Your Account</a>
         </div>
       </div>
     </section>
