@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             scrollbar-width: none; /* ✅ hide scrollbar in Firefox */
             -ms-overflow-style: none; /* ✅ hide scrollbar in IE/Edge */
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
+            background: linear-gradient(135deg, #aaa2bcff 0%, #937db1ff 100%);
         }
 
         body::-webkit-scrollbar {

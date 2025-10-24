@@ -81,6 +81,8 @@ include(__DIR__ . "/includes/navbar.php");
     .hero-text {
       flex: 1;
       max-width: 600px;
+      text-align: left;
+      margin-left: 80px;
     }
 
     .hero-text h1 {
@@ -89,6 +91,7 @@ include(__DIR__ . "/includes/navbar.php");
       font-size: 2.8rem;
       margin-bottom: 20px;
       text-shadow: 0 0 10px rgba(166, 40, 197, 0.5);
+      line-height: 1.2;
     }
 
     .hero-text p {
@@ -97,6 +100,7 @@ include(__DIR__ . "/includes/navbar.php");
       font-size: 1.1rem;
       margin-bottom: 30px;
       line-height: 1.6;
+      max-width: 500px;
     }
 
     .hero-text .btn {
@@ -244,7 +248,7 @@ include(__DIR__ . "/includes/navbar.php");
       line-height: 1.6;
     }
 
-    /* Zodiac Cards */
+    /* Zodiac Cards - Fixed height consistency */
     .zodiac-card {
       text-align: center;
       padding: 30px 20px;
@@ -254,6 +258,10 @@ include(__DIR__ . "/includes/navbar.php");
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
       margin-bottom: 30px;
+      height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .zodiac-card:hover {
@@ -286,6 +294,10 @@ include(__DIR__ . "/includes/navbar.php");
       color: #e0e0ff;
       font-size: 0.9rem;
       line-height: 1.4;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* CTA Section */
@@ -326,17 +338,17 @@ include(__DIR__ . "/includes/navbar.php");
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     }
 
-    /* Footer Styling */
+    /* Footer Styling - Smaller container with original text size */
     footer {
       background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(10px);
-      padding: 60px 0 30px;
+      padding: 30px 0 15px; /* Reduced padding */
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .footer-brand {
       font-weight: 700;
-      font-size: 1.8rem;
+      font-size: 1.8rem; /* Original size */
       color: white;
       margin-bottom: 1rem;
       text-shadow: 0 0 10px rgba(166, 40, 197, 0.5);
@@ -345,14 +357,15 @@ include(__DIR__ . "/includes/navbar.php");
     .footer-description {
       color: #e0e0ff;
       line-height: 1.6;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+      font-size: 1rem; /* Original size */
     }
 
     .footer-links h5 {
       color: white;
       font-weight: 600;
-      margin-bottom: 1.5rem;
-      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      font-size: 1.1rem; /* Original size */
     }
 
     .footer-links a {
@@ -360,8 +373,8 @@ include(__DIR__ . "/includes/navbar.php");
       text-decoration: none;
       transition: color 0.3s ease;
       display: block;
-      margin-bottom: 0.8rem;
-      font-size: 0.95rem;
+      margin-bottom: 0.6rem;
+      font-size: 1rem; /* Original size */
     }
 
     .footer-links a:hover {
@@ -371,7 +384,7 @@ include(__DIR__ . "/includes/navbar.php");
 
     .social-links {
       display: flex;
-      gap: 15px;
+      gap: 12px;
       margin-top: 1rem;
     }
 
@@ -379,13 +392,14 @@ include(__DIR__ . "/includes/navbar.php");
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      width: 40px; /* Original size */
+      height: 40px; /* Original size */
       background: rgba(255, 255, 255, 0.1);
       border-radius: 50%;
       color: #e0e0ff;
       text-decoration: none;
       transition: all 0.3s ease;
+      font-size: 1rem; /* Original size */
     }
 
     .social-links a:hover {
@@ -398,9 +412,10 @@ include(__DIR__ . "/includes/navbar.php");
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 25px;
-      padding: 12px 20px;
+      padding: 12px 20px; /* Original size */
       color: white;
       width: 100%;
+      font-size: 1rem; /* Original size */
     }
 
     .subscribe-input::placeholder {
@@ -418,11 +433,12 @@ include(__DIR__ . "/includes/navbar.php");
       background: #c19bfa;
       border: none;
       border-radius: 25px;
-      padding: 12px 25px;
+      padding: 12px 25px; /* Original size */
       color: white;
       font-weight: 500;
       transition: all 0.3s ease;
       white-space: nowrap;
+      font-size: 1rem; /* Original size */
     }
 
     .subscribe-btn:hover {
@@ -432,8 +448,9 @@ include(__DIR__ . "/includes/navbar.php");
 
     .footer-bottom {
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 30px;
-      margin-top: 40px;
+      padding-top: 20px;
+      margin-top: 25px; /* Reduced margin */
+      font-size: 0.9rem; /* Original size */
     }
 
     .footer-bottom a {
@@ -451,6 +468,11 @@ include(__DIR__ . "/includes/navbar.php");
         flex-direction: column;
         text-align: center;
         padding: 40px 20px;
+      }
+
+      .hero-text {
+        margin-left: 0;
+        text-align: center;
       }
 
       .wheel {
@@ -477,6 +499,15 @@ include(__DIR__ . "/includes/navbar.php");
 
       .footer-links {
         margin-bottom: 2rem;
+      }
+      
+      .zodiac-card {
+        height: auto;
+        min-height: 240px;
+      }
+      
+      footer {
+        padding: 25px 0 15px; /* Adjusted for mobile */
       }
     }
   </style>
@@ -527,8 +558,8 @@ include(__DIR__ . "/includes/navbar.php");
               <div class="feature-icon">
                 <i class="fas fa-chart-line"></i>
               </div>
-              <h4>Personalized Forecast</h4>
-              <p>Get daily, weekly, and monthly fashion recommendations based on your zodiac sign and current planetary alignments.</p>
+              <h4>Personalized Moodboard</h4>
+              <p>Recieve a personalized magazine-style visual summary of the your complete style profile personal data.</p>
             </div>
           </div>
           <div class="col-md-4">
@@ -545,8 +576,8 @@ include(__DIR__ . "/includes/navbar.php");
               <div class="feature-icon">
                 <i class="fas fa-tshirt"></i>
               </div>
-              <h4>Style Recommendations</h4>
-              <p>Receive tailored outfit suggestions that align with your zodiac personality and current fashion trends.</p>
+              <h4>Virtual Style Studio</h4>
+              <p>A virtual closet where users mix-and-match fashion items to discover their personal style through interactive dressing.</p>
             </div>
           </div>
         </div>
@@ -564,7 +595,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-ram"></i>
+                ♈
               </div>
               <h5>Aries</h5>
               <p class="zodiac-desc">Bold & Dynamic - Confident, energetic styles with fiery accents</p>
@@ -574,7 +605,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-gem"></i>
+                ♉
               </div>
               <h5>Taurus</h5>
               <p class="zodiac-desc">Luxurious & Earthy - Quality fabrics and nature-inspired tones</p>
@@ -584,7 +615,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-users"></i>
+                ♊
               </div>
               <h5>Gemini</h5>
               <p class="zodiac-desc">Versatile & Expressive - Mix-and-match pieces for every occasion</p>
@@ -594,7 +625,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-moon"></i>
+                ♋
               </div>
               <h5>Cancer</h5>
               <p class="zodiac-desc">Comforting & Nostalgic - Soft textures and sentimental pieces</p>
@@ -604,7 +635,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-sun"></i>
+                ♌
               </div>
               <h5>Leo</h5>
               <p class="zodiac-desc">Dramatic & Regal - Bold statements and attention-grabbing pieces</p>
@@ -614,7 +645,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-pencil-alt"></i>
+                ♍
               </div>
               <h5>Virgo</h5>
               <p class="zodiac-desc">Refined & Practical - Tailored fits and functional elegance</p>
@@ -624,7 +655,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-balance-scale"></i>
+                ♎
               </div>
               <h5>Libra</h5>
               <p class="zodiac-desc">Harmonious & Chic - Balanced ensembles and romantic touches</p>
@@ -634,7 +665,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-scorpion"></i>
+                ♏
               </div>
               <h5>Scorpio</h5>
               <p class="zodiac-desc">Intense & Mysterious - Dark hues and transformative pieces</p>
@@ -644,7 +675,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-arrow-right"></i>
+                ♐
               </div>
               <h5>Sagittarius</h5>
               <p class="zodiac-desc">Adventurous & Free - Bohemian styles and travel-ready outfits</p>
@@ -654,7 +685,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-mountain"></i>
+                ♑
               </div>
               <h5>Capricorn</h5>
               <p class="zodiac-desc">Classic & Ambitious - Timeless silhouettes and professional elegance</p>
@@ -664,7 +695,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-water"></i>
+                ♒
               </div>
               <h5>Aquarius</h5>
               <p class="zodiac-desc">Innovative & Unique - Futuristic cuts and unconventional styling</p>
@@ -674,7 +705,7 @@ include(__DIR__ . "/includes/navbar.php");
           <div class="col-md-3 col-6">
             <div class="zodiac-card">
               <div class="zodiac-icon">
-                <i class="fas fa-fw fa-fish"></i>
+                ♓
               </div>
               <h5>Pisces</h5>
               <p class="zodiac-desc">Dreamy & Artistic - Flowing fabrics and ethereal, romantic looks</p>
@@ -699,42 +730,30 @@ include(__DIR__ . "/includes/navbar.php");
     <footer>
       <div class="container">
         <div class="row">
-          <div class="col-lg-4 mb-4">
+          <div class="col-lg-5 mb-4">
             <div class="footer-brand">CELESTICARE</div>
             <p class="footer-description">
               Where astrology meets fashion. Discover your unique style through the wisdom of the stars and express your true cosmic self.
             </p>
             <div class="social-links">
-              <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-              <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-              <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-              <a href="#" title="Pinterest"><i class="fab fa-pinterest"></i></a>
+              <a href="https://www.facebook.com/" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="https://www.instagram.com/" title="Instagram"><i class="fab fa-instagram"></i></a>
+              <a href="https://x.com/" title="Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="https://ph.pinterest.com/" title="Pinterest"><i class="fab fa-pinterest"></i></a>
             </div>
           </div>
           
-          <div class="col-lg-2 col-md-4 mb-4">
+          <div class="col-lg-3 col-md-4 mb-4">
             <div class="footer-links">
               <h5>Quick Links</h5>
-              <a href="#">Home</a>
-              <a href="#">Zodiacs</a>
-              <a href="#">Forecast</a>
-              <a href="#">About Us</a>
-              <a href="#">Contact</a>
+              <a href="./index.php">Home</a>
+              <a href="./zodiac/index.php">Zodiacs</a>
+              <a href="./forecast/index.php">Forecast</a>
+              <a href="./about.php">About Us</a>
             </div>
           </div>
           
-          <div class="col-lg-3 col-md-4 mb-4">
-            <div class="footer-links">
-              <h5>Zodiac Signs</h5>
-              <a href="#">Aries</a>
-              <a href="#">Taurus</a>
-              <a href="#">Gemini</a>
-              <a href="#">Cancer</a>
-              <a href="#">View All Signs</a>
-            </div>
-          </div>
-          
-          <div class="col-lg-3 col-md-4 mb-4">
+          <div class="col-lg-4 col-md-4 mb-4">
             <div class="footer-links">
               <h5>Newsletter</h5>
               <p class="footer-description" style="margin-bottom: 1rem;">Get daily fashion tips based on your zodiac sign.</p>
@@ -749,11 +768,11 @@ include(__DIR__ . "/includes/navbar.php");
         <div class="footer-bottom">
           <div class="row align-items-center">
             <div class="col-md-6">
-              <p class="mb-0">&copy; 2024 CelestiCare. All rights reserved.</p>
+              <p class="mb-0">&copy; 2025 CelestiCare. All rights reserved.</p>
             </div>
             <div class="col-md-6 text-md-end">
-              <a href="#" class="me-3">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
+              <a href="./privacy.php" class="me-3">Privacy Policy</a>
+              <a href="./terms.php">Terms of Service</a>
             </div>
           </div>
         </div>
@@ -925,70 +944,115 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(startShootingStars, nextInterval);
   }
   
-  // Music control functionality
-  function setupMusic() {
-    const music = document.getElementById('backgroundMusic');
-    const musicControl = document.getElementById('musicControl');
+// Music control functionality
+function setupMusic() {
+  const music = document.getElementById('backgroundMusic');
+  const musicControl = document.getElementById('musicControl');
 
-    music.volume = 0.3;
+  music.volume = 0.3;
 
-    // Try to play music automatically when page loads
-    window.addEventListener('load', function() {
-      music.play().catch(error => {
+  // Enhanced autoplay function with user interaction
+  function startAudio() {
+    // Reset the audio to beginning
+    music.currentTime = 0;
+    
+    // Play the audio
+    const playPromise = music.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // Audio started successfully
+        music.muted = false;
+        musicControl.innerHTML = '🔈';
+        musicControl.classList.remove('muted');
+        musicControl.title = 'Click to mute';
+        console.log('Audio started successfully');
+      }).catch(error => {
         console.log('Autoplay prevented:', error);
-        // If autoplay is blocked, show a play button
+        // If autoplay is blocked, show a play button and try again on user interaction
         musicControl.innerHTML = '▶️';
         musicControl.title = 'Click to play music (autoplay was blocked)';
+        
+        // Add a one-time click handler to start audio on user interaction
+        const startOnInteraction = () => {
+          music.play().then(() => {
+            music.muted = false;
+            musicControl.innerHTML = '🔈';
+            musicControl.classList.remove('muted');
+            musicControl.title = 'Click to mute';
+            document.removeEventListener('click', startOnInteraction);
+          }).catch(e => {
+            console.log('Manual play also failed:', e);
+          });
+        };
+        
+        document.addEventListener('click', startOnInteraction, { once: true });
       });
-    });
+    }
+  }
 
-    // Toggle mute/unmute when music control is clicked
-    musicControl.addEventListener('click', function() {
-      if (music.paused) {
-        // If music is paused, play it
-        music.play().then(() => {
-          music.muted = false;
-          musicControl.innerHTML = '🔈';
-          musicControl.classList.remove('muted');
-          musicControl.title = 'Click to mute';
-        }).catch(error => {
-          console.log('Play failed:', error);
-        });
-      } else {
-        // If music is playing, toggle mute
-        music.muted = !music.muted;
-        if (music.muted) {
-          musicControl.innerHTML = '🔇';
-          musicControl.classList.add('muted');
-          musicControl.title = 'Click to unmute';
-        } else {
-          musicControl.innerHTML = '🔈';
-          musicControl.classList.remove('muted');
-          musicControl.title = 'Click to mute';
-        }
-      }
-    });
+  // Try to play music automatically when page loads - with a slight delay to ensure DOM is ready
+  window.addEventListener('load', function() {
+    // Small delay to ensure everything is loaded
+    setTimeout(startAudio, 500);
+  });
 
-    // Update icon based on initial state
-    music.addEventListener('loadeddata', function() {
+  // Also try to play when the page becomes visible (for tabs that start in background)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible' && music.paused) {
+      setTimeout(startAudio, 300);
+    }
+  });
+
+  // Toggle mute/unmute when music control is clicked
+  musicControl.addEventListener('click', function(event) {
+    event.stopPropagation(); // Prevent triggering document click listener
+    
+    if (music.paused) {
+      // If music is paused, play it
+      music.play().then(() => {
+        music.muted = false;
+        musicControl.innerHTML = '🔈';
+        musicControl.classList.remove('muted');
+        musicControl.title = 'Click to mute';
+      }).catch(error => {
+        console.log('Play failed:', error);
+      });
+    } else {
+      // If music is playing, toggle mute
+      music.muted = !music.muted;
       if (music.muted) {
         musicControl.innerHTML = '🔇';
         musicControl.classList.add('muted');
+        musicControl.title = 'Click to unmute';
       } else {
         musicControl.innerHTML = '🔈';
         musicControl.classList.remove('muted');
+        musicControl.title = 'Click to mute';
       }
-    });
+    }
+  });
 
-    // Handle cases where autoplay might be blocked by browser
-    music.addEventListener('pause', function() {
-      if (music.currentTime === 0) {
-        // Music was never started due to autoplay restrictions
-        musicControl.innerHTML = '▶️';
-        musicControl.title = 'Click to play music';
-      }
-    });
-  }
+  // Update icon based on initial state
+  music.addEventListener('loadeddata', function() {
+    if (music.muted) {
+      musicControl.innerHTML = '🔇';
+      musicControl.classList.add('muted');
+    } else {
+      musicControl.innerHTML = '🔈';
+      musicControl.classList.remove('muted');
+    }
+  });
+
+  // Handle cases where autoplay might be blocked by browser
+  music.addEventListener('pause', function() {
+    if (music.currentTime === 0) {
+      // Music was never started due to autoplay restrictions
+      musicControl.innerHTML = '▶️';
+      musicControl.title = 'Click to play music';
+    }
+  });
+}
 
   // Initialize animations and music
   createStars();

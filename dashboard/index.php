@@ -377,8 +377,6 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
 }
 
 /* Enhanced Profile Section */
-/* Fixed Profile Section */
-/* Fixed Profile Section Styles */
 .profile-section {
     border-radius: 10px;
     background-color: #fff;
@@ -404,30 +402,27 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
     padding: 2px 0;
 }
 
-.profile-info strong {
-    color: #6a1b9a;
-    min-width: 80px;
-    display: inline-block;
-}
-
 .profile-item {
     margin-bottom: 8px;
     display: flex;
     align-items: center;
     min-height: auto;
+    padding: 4px 0;
 }
 
 .profile-label {
-    font-weight: 600;
+    font-weight: 700; /* Changed from 600 to 700 for bolder text */
     color: #6a1b9a;
     min-width: 100px;
     font-size: 0.9rem;
 }
 
 .profile-value {
-    color: #555;
+    color: #333; /* Changed from #555 to #333 for better contrast */
     flex: 1;
     font-size: 0.9rem;
+    font-weight: 600; /* Added bold weight to user info */
+    text-align: left; /* Ensure consistent alignment */
 }
 
 /* Remove any extra margins that might be causing gaps */
@@ -446,7 +441,8 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
     margin-top: 30px;
 }
 
-/* Fix for mobile responsiveness */
+
+/* Enhanced mobile responsiveness */
 @media (max-width: 768px) {
     .profile-info p {
         margin-bottom: 6px;
@@ -455,28 +451,47 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
     
     .profile-item {
         margin-bottom: 6px;
+        flex-direction: row; /* Keep items in row layout */
+        align-items: flex-start; /* Align to top */
+        text-align: left;
     }
     
     .profile-label {
         min-width: 90px;
+        font-weight: 700; /* Maintain bold on mobile */
+    }
+    
+    .profile-value {
+        text-align: left; /* Force left alignment */
+        font-weight: 600; /* Maintain bold on mobile */
+        margin-left: 0; /* Remove any left margin */
+        padding-left: 0; /* Remove any left padding */
     }
 }
 
 @media (max-width: 480px) {
-    .profile-info p {
-        margin-bottom: 5px;
-        font-size: 0.85rem;
+    .grid-container {
+        grid-template-columns: 1fr;
     }
     
     .profile-label {
-        min-width: 80px;
+        min-width: 85px;
         font-size: 0.85rem;
+        font-weight: 700;
     }
     
     .profile-value {
         font-size: 0.85rem;
+        font-weight: 600;
+        text-align: left;
+        word-break: break-word; /* Handle long text */
+    }
+    
+    .profile-item {
+        flex-wrap: nowrap; /* Prevent wrapping to new lines */
     }
 }
+
 
 /* Single item preview */
 .single-item-preview {
@@ -593,6 +608,7 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
 
 .zodiac-details {
     font-size: 0.9rem;
+    font-weight: 600;
     line-height: 1.4;
 }
 

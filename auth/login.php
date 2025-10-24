@@ -94,7 +94,7 @@ ob_end_flush();
             overflow-y: scroll;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
+            background: linear-gradient(135deg, #aaa2bcff 0%, #937db1ff 100%);
             font-family: 'Poppins', sans-serif;
         }
 

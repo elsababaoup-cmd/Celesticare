@@ -1,5 +1,29 @@
 <?php
 session_start();
+include("../config/dbconfig.php");
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../auth/login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Check if user has already completed the aesthetic quiz
+$stmt = $conn->prepare("SELECT aesthetic_result FROM users WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$stmt->bind_result($aesthetic_result);
+$stmt->fetch();
+$stmt->close();
+
+// If user already has an aesthetic result, redirect to moodboard
+if (!empty($aesthetic_result)) {
+    header("Location: ../moodboard/moodboard.php");
+    exit();
+}
+
 include("../includes/navbar.php");
 ?>
 

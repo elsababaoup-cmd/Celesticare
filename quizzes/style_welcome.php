@@ -131,7 +131,7 @@ include("../includes/navbar.php");
       <h2>Discover Your Stylistic Vibe</h2>
       <p>
         Every person carries a signature visual rhythm — a harmony between personality, energy, and style.
-        Begin your journey, dress your own manneequin as you please, right click to remove unwanted clothing.
+        Begin your journey to uncover the style that defines and best suits you, shaping how you see and express yourself.
       </p>
       <a href="bodytype_analysis.php" class="btn btn-start mt-3" id="startBtn">Begin!</a>
     </div>

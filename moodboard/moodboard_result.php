@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("../includes/navbar.php");
+
 include("../config/dbconfig.php");
 
 if (!isset($_SESSION['user_id'])) {
@@ -275,6 +275,8 @@ $astro_fact = $astroFacts[$user['zodiac_sign']] ?? "Your zodiac influences your 
 $user_palette = $palettes[$user['zodiac_sign']][strtolower($user['undertone'])] ?? ["#8B5FBF", "#6D28D9", "#C084FC", "#495482", "#9b83d3", "#F8FAFC"];
 
 $base_path = "/Celesticare/undertone/assets/";
+
+include("../includes/navbar.php");
 ?>
 
 <!DOCTYPE html>
@@ -917,19 +919,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width:0!important; height:0!i
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
 
-    // In moodboard page
-function redirectToStyleQuiz() {
-    // Create a temporary button that user must click to enable audio
-    const enableAudio = confirm("Enable background music for styling experience?");
-    if (enableAudio) {
-        // Store a flag that audio is allowed
-        localStorage.setItem('audioAllowed', 'true');
-        window.location.href = 'style_quiz.php';
-    } else {
-        localStorage.setItem('audioAllowed', 'false');
-        window.location.href = 'style_quiz.php';
-    }
-}
+    
     // Add spinning effect to color wheel on hover
     document.addEventListener('DOMContentLoaded', function() {
       const colorWheel = document.querySelector('.color-wheel');

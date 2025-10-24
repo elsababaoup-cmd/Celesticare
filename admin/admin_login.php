@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             overflow-y: scroll;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            background: linear-gradient(135deg, #d3cce3 0%, #e9e4f0 100%);
+            background: linear-gradient(135deg, #3f3d44ff 0%, #61389aff 100%);
             font-family: 'Poppins', sans-serif;
         }
 
@@ -75,11 +75,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .login-container {
-            min-height: 80vh;
+            min-height: 90vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 50px;
         }
 
         .login-box {
