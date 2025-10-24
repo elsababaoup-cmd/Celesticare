@@ -47,6 +47,17 @@ if (mysqli_num_rows($table_check) > 0) {
     $feedback_query = "SELECT * FROM user_feedback WHERE user_id = '$user_id' ORDER BY created_at DESC";
     $feedback_result = mysqli_query($conn, $feedback_query);
     $feedback_count = $feedback_result ? mysqli_num_rows($feedback_result) : 0;
+    
+    // Store all feedback in an array so we can use it multiple times
+    $all_feedback = [];
+    if ($feedback_result && $feedback_count > 0) {
+        while ($row = mysqli_fetch_assoc($feedback_result)) {
+            $all_feedback[] = $row;
+        }
+    }
+} else {
+    $all_feedback = [];
+    $feedback_count = 0;
 }
 
 // Handle form submission
@@ -557,6 +568,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Feedback Section -->
+    <div class="feedback-container">
+        <h3 class="section-title"><i class="fas fa-comments me-2"></i>User Feedback (<?= $feedback_count ?>)</h3>
+        
+        <?php if ($feedback_count > 0): ?>
+            <?php foreach ($all_feedback as $feedback): ?>
+                <div class="feedback-item">
+                    <div class="feedback-header">
+                        <div class="feedback-rating">
+                            <?php 
+                            // Display star rating for experience
+                            $experience = $feedback['experience'] ?? 0;
+                            for ($i = 1; $i <= 5; $i++): 
+                                if ($i <= $experience): ?>
+                                    <i class="fas fa-star text-warning"></i>
+                                <?php else: ?>
+                                    <i class="far fa-star text-warning"></i>
+                                <?php endif;
+                            endfor; ?>
+                            <span class="ms-2">Overall Experience: <?= $experience ?>/5</span>
+                        </div>
+                        <div class="feedback-date">
+                            <?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?>
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-details mt-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Fashion Match:</strong> 
+                                    <span class="badge bg-info"><?= htmlspecialchars($feedback['fashion_match'] ?? 'Not specified') ?></span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Favorite Feature:</strong> 
+                                    <span class="badge bg-primary"><?= htmlspecialchars($feedback['favorite_feature'] ?? 'Not specified') ?></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Website Vibe:</strong> 
+                                    <span class="badge bg-success">"<?= htmlspecialchars($feedback['vibe'] ?? 'Not specified') ?>"</span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <?php if (!empty($feedback['suggestions'])): ?>
+                            <div class="suggestions mt-3">
+                                <p><strong>Suggestions & Comments:</strong></p>
+                                <div class="p-3 bg-light rounded">
+                                    <?= nl2br(htmlspecialchars($feedback['suggestions'])) ?>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted mt-2"><em>No additional suggestions provided.</em></p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="empty-feedback">
+                <i class="fas fa-comment-slash"></i>
+                <h4>No Feedback Yet</h4>
+                <p class="mb-0">This user hasn't submitted any feedback yet.</p>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
