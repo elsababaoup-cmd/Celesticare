@@ -1,15 +1,15 @@
 <?php
 // about.php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: auth/login.php");
-    exit();
-}
-
 include("config/dbconfig.php");
 
-// Handle form submit
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+// Initialize variables
+$message = '';
+$user_id = $_SESSION['user_id'] ?? null;
+$is_logged_in = isset($_SESSION['user_id']);
+
+// Handle form submit - ONLY if user is logged in
+if ($_SERVER["REQUEST_METHOD"] === "POST" && $is_logged_in) {
     $user_id = $_SESSION['user_id'];
     $experience = intval($_POST['experience'] ?? 0);
     $fashionMatch = $conn->real_escape_string($_POST['fashion_match'] ?? '');
@@ -48,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 include("includes/navbar.php");
+
 ?>
 
 <!DOCTYPE html>
@@ -93,7 +94,7 @@ include("includes/navbar.php");
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 60%),
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08) 0%, rgba(36, 36, 36, 0.65) 60%),
         linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
       color: var(--headline);
@@ -517,6 +518,35 @@ include("includes/navbar.php");
     body::-webkit-scrollbar {
         display: none;
     }
+
+        /* Login Prompt Button Styles */
+    .login-prompt-btn {
+        background-color: #6b5b95;
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        padding: 12px 20px;
+        font-weight: 500;
+        transition: 0.3s;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .login-prompt-btn:hover {
+        background-color: #8c77c5;
+        color: #fff;
+        transform: translateY(-2px);
+    }
+    
+    .login-prompt-btn.black {
+        background-color: #2e2e2e;
+    }
+    
+    .login-prompt-btn.black:hover {
+        background-color: #4a4a4a;
+    }
   </style>
 </head>
 <body>
@@ -606,7 +636,7 @@ include("includes/navbar.php");
             <div class="team-grid">
               <!-- Member 1 -->
               <div class="team-card">
-                <div class="member-role">Project Manager, UI Designer</div>
+                <div class="member-role">Project Manager, UI Designer & Records Manager</div>
                 <div class="member-name">Ma. Monica Laca Deloa</div>
                 <div class="member-desc">
                   Leads vision, user experience, and delivery. Aligns timelines,
@@ -617,7 +647,7 @@ include("includes/navbar.php");
 
               <!-- Member 2 -->
               <div class="team-card">
-                <div class="member-role">Systems Analyst, Main Developer, UI/UX Programmer, Database Admin</div>
+                <div class="member-role">Systems Analyst, Main Developer, UI/UX Programmer & Database Admin</div>
                 <div class="member-name">Elle Skye Babao</div>
                 <div class="member-desc">
                   Turns ideas into working features. Designs system logic,
@@ -628,7 +658,7 @@ include("includes/navbar.php");
 
               <!-- Member 3 -->
               <div class="team-card">
-                <div class="member-role">Documentation Specialist</div>
+                <div class="member-role">Documentation Specialist & Assistant Programmer</div>
                 <div class="member-name">Bryan Josef Sarmiento</div>
                 <div class="member-desc">
                   Maintains clarity across the project. Creates and organizes
@@ -651,7 +681,8 @@ include("includes/navbar.php");
     <i class="fas fa-comment-dots"></i> Give Feedback
   </button>
 
-  <!-- FEEDBACK MODAL -->
+  <!-- FEEDBACK MODAL - Only show if user is logged in -->
+  <?php if ($is_logged_in): ?>
   <div id="feedbackModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
@@ -712,6 +743,31 @@ include("includes/navbar.php");
       </div>
     </div>
   </div>
+  <?php else: ?>
+  <!-- Login Prompt Modal for Non-Logged-in Users -->
+  <div id="loginPromptModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Join Our Community</h2>
+        <button class="close-modal" onclick="closeLoginPromptModal()">&times;</button>
+      </div>
+      <div class="modal-body text-center">
+        <i class="fas fa-users" style="font-size: 3rem; color: #6b5b95; margin-bottom: 1rem;"></i>
+        <h4 style="color: #2e2e2e; margin-bottom: 15px;">Want to share your thoughts?</h4>
+        <p style="color: #575767; margin-bottom: 25px;">Create an account to provide feedback and get personalized style recommendations!</p>
+        <div class="d-grid gap-2" style="max-width: 300px; margin: 0 auto;">
+            <a href="auth/login.php" class="login-prompt-btn">
+                Login
+            </a>
+            <a href="auth/register.php" class="login-prompt-btn black">
+                Sign Up
+            </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
+
 
   <script>
     // Tab functionality
@@ -732,7 +788,8 @@ include("includes/navbar.php");
       });
     });
 
-    // Modal functionality
+    // Modal functionality for logged-in users
+    <?php if ($is_logged_in): ?>
     function openFeedbackModal() {
       document.getElementById('feedbackModal').style.display = 'block';
       document.body.style.overflow = 'hidden';
@@ -750,18 +807,40 @@ include("includes/navbar.php");
       }
     });
 
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeFeedbackModal();
-      }
-    });
-
     // Auto-open modal if there's a message (after form submission)
     <?php if (isset($message)): ?>
       setTimeout(openFeedbackModal, 500);
     <?php endif; ?>
-  </script>
+    <?php else: ?>
+    // For non-logged-in users, show login prompt
+    function openFeedbackModal() {
+      document.getElementById('loginPromptModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
 
+    function closeLoginPromptModal() {
+      document.getElementById('loginPromptModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('loginPromptModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeLoginPromptModal();
+      }
+    });
+    <?php endif; ?>
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        <?php if ($is_logged_in): ?>
+          closeFeedbackModal();
+        <?php else: ?>
+          closeLoginPromptModal();
+        <?php endif; ?>
+      }
+    });
+  </script>
 </body>
 </html>
