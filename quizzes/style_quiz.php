@@ -81,9 +81,9 @@ if (!$gender || !in_array($gender, ['feminine', 'masculine'])) {
     /* Music Control Button */
     .music-control {
       position: fixed;
-      top: 20px;
+      top: 105px;
       right: 20px;
-      z-index: 1000;
+      z-index: 1050;
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255,255,255,0.3);
@@ -108,6 +108,18 @@ if (!$gender || !in_array($gender, ['feminine', 'masculine'])) {
       background: rgba(255,255,255,0.1);
       color: #ccc;
     }
+
+        /* Mobile responsive styles for audio button */
+    @media (max-width: 991px) {
+      .music-control {
+        top: 90px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+      }
+    }
+
 
     .bg-accent { position:absolute; border-radius:50%; filter:blur(120px); opacity:0.3; z-index:0; animation:float 10s ease-in-out infinite alternate; }
     .bg-accent.one { background:#bba6ff; width:400px; height:400px; top:-80px; left:-80px; }
@@ -523,9 +535,51 @@ function setupMusic() {
 }
 
 // Load mannequin
+// Load mannequin
 function loadMannequin() {
-  mannequin.src = currentGender === 'fem' ? '../quizzes/assets/fem_mannequin.png' : '../quizzes/assets/Untitled24_20251020142151.png';
-  toggleGenderBtn.textContent = currentGender === 'fem' ? 'Switch to Masculine' : 'Switch to Feminine';
+  // Try multiple possible paths
+  const paths = {
+    fem: [
+      '../quizzes/assets/fem_mannequin.png',
+      'assets/fem_mannequin.png',
+      './assets/fem_mannequin.png',
+      '../assets/fem_mannequin.png'
+    ],
+    masc: [
+      '../quizzes/assets/Untitled24_20251020142151.png',
+      'assets/Untitled24_20251020142151.png',
+      './assets/Untitled24_20251020142151.png',
+      '../assets/Untitled24_20251020142151.png'
+    ]
+  };
+  
+  const pathList = currentGender === 'fem' ? paths.fem : paths.masc;
+  let currentTry = 0;
+  
+  function tryLoadImage() {
+    if (currentTry >= pathList.length) {
+      console.error('All mannequin paths failed to load');
+      return;
+    }
+    
+    const mannequinSrc = pathList[currentTry];
+    console.log('Trying to load mannequin:', mannequinSrc);
+    
+    mannequin.src = mannequinSrc;
+    
+    mannequin.onerror = function() {
+      console.error('Failed to load:', mannequinSrc);
+      currentTry++;
+      tryLoadImage();
+    };
+    
+    mannequin.onload = function() {
+      console.log('Successfully loaded:', mannequinSrc);
+      toggleGenderBtn.textContent = currentGender === 'fem' ? 'Switch to Masculine' : 'Switch to Feminine';
+    };
+  }
+  
+  tryLoadImage();
 }
 
 // Load clothing items
@@ -546,6 +600,7 @@ function loadClothing() {
 
   enableDrag();
 
+  // Update button text based on current clothing set
   toggleClothesBtn.textContent = currentClothingSet === 'fem' ? 'Show Masculine Clothes' : 'Show Feminine Clothes';
   document.getElementById('dresses-category').style.display = currentClothingSet === 'fem' ? 'block' : 'none';
 }
@@ -627,13 +682,13 @@ resetBtn.addEventListener('click', () => {
 
 // Toggle mannequin gender
 toggleGenderBtn.addEventListener('click', () => {
+  console.log('Current gender before toggle:', currentGender);
   currentGender = currentGender === 'fem' ? 'masc' : 'fem';
-  currentClothingSet = currentGender;
+  console.log('Current gender after toggle:', currentGender);
   loadMannequin();
-  loadClothing();
 });
 
-// Toggle clothing set
+// Toggle clothing set  
 toggleClothesBtn.addEventListener('click', () => {
   currentClothingSet = currentClothingSet === 'fem' ? 'masc' : 'fem';
   loadClothing();
@@ -697,6 +752,7 @@ document.getElementById('finishBtn').addEventListener('click', () => {
 
 // Initial load
 setupMusic();
+console.log('Initial gender:', currentGender);
 loadMannequin();
 loadClothing();
 </script>

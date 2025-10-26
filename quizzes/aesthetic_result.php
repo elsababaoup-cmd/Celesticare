@@ -246,9 +246,9 @@ p {
 /* Music  Button */
 .music-control {
   position: fixed;
-  top: 20px;
+  top: 105px;
   right: 20px;
-  z-index: 1000;
+  z-index: 1050;
   background: rgba(255,255,255,0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.3);
@@ -274,34 +274,16 @@ p {
   color: #ccc;
 }
 
-.music-control {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: white;
-  font-size: 1.2rem;
-}
 
-.music-control:hover {
-  background: rgba(255,255,255,0.3);
-  transform: scale(1.1);
-}
-
-.music-control.muted {
-  background: rgba(255,255,255,0.1);
-  color: #ccc;
+/* Mobile responsive styles for audio button */
+@media (max-width: 991px) {
+  .music-control {
+    top: 90px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
 }
 
 html::-webkit-scrollbar, body::-webkit-scrollbar {

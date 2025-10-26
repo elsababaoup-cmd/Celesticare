@@ -35,8 +35,6 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
 }
 ?>
 
-<!-- Rest of your existing navbar code remains the same -->
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -47,7 +45,13 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
     padding: 15px 60px;
     font-family: 'Poppins', sans-serif;
     border-bottom: 1px solid #eee;
-    min-height: 80px; /* Fixed navbar height */
+    min-height: 80px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1030;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
   }
 
   .navbar-brand {
@@ -62,14 +66,14 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-    height: 60px !important; /* Fixed brand height */
+    height: 60px !important;
   }
 
   .navbar-logo {
-    height: 80px; /* You can adjust this without affecting navbar sizing */
+    height: 80px;
     width: auto;
     object-fit: contain;
-    max-height: 80px; /* Prevents overflow */
+    max-height: 80px;
   }
 
   .navbar-nav .nav-link {
@@ -94,6 +98,55 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
 
   .navbar-toggler {
     border: none;
+    padding: 4px 8px;
+  }
+
+  .navbar-toggler:focus {
+    box-shadow: none !important;
+  }
+
+  .navbar-toggler-icon {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  /* Mobile menu styles */
+  @media (max-width: 991px) {
+    nav.navbar {
+      padding: 15px 20px;
+      min-height: 70px;
+    }
+    
+    .navbar-collapse {
+      background: #ffffff;
+      margin-top: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 10px;
+    }
+    
+    .navbar-nav .nav-link {
+      flex-direction: row;
+      justify-content: flex-start;
+      padding: 12px 15px;
+      border-bottom: 1px solid #f5f5f5;
+      margin: 0;
+    }
+    
+    .nav-icon, .nav-fa-icon {
+      margin-bottom: 0;
+      margin-right: 12px;
+    }
+
+    .navbar-brand {
+      font-size: 1.8rem !important;
+      height: 50px !important;
+    }
+
+    .navbar-logo {
+      height: 35px;
+      max-height: 40px;
+    }
   }
 
   .nav-icon {
@@ -118,35 +171,19 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
     transform: translateY(-2px);
   }
 
-  @media (max-width: 991px) {
-    nav.navbar {
-      padding: 15px 20px;
-      min-height: 70px; /* Fixed mobile navbar height */
-    }
-    
-    .navbar-brand {
-      font-size: 1.8rem !important;
-      height: 50px !important; /* Fixed mobile brand height */
-    }
-    
-    .navbar-nav .nav-link {
-      flex-direction: row;
-      justify-content: flex-start;
-    }
-    
-    .nav-icon, .nav-fa-icon {
-      margin-bottom: 0;
-      margin-right: 8px;
-    }
+  /* Body padding to account for fixed navbar */
+  body {
+    padding-top: 100px !important;
+  }
 
-    .navbar-logo {
-      height: 35px; /* Adjust for mobile if needed */
-      max-height: 40px; /* Prevents mobile overflow */
+  @media (max-width: 991px) {
+    body {
+      padding-top: 90px !important;
     }
   }
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-light">
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="<?= $BASE ?>/index.php">
       <img src="<?= $BASE ?>/includes/logo1.png" alt="CelestiCare Logo" class="navbar-logo">
@@ -217,3 +254,23 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
     </div>
   </div>
 </nav>
+
+<!-- Make sure Bootstrap JS is loaded -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Close mobile menu when clicking on a link
+document.addEventListener('DOMContentLoaded', function() {
+  const navLinks = document.querySelectorAll('.nav-link');
+  const navbarCollapse = document.querySelector('.navbar-collapse');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth < 992) {
+        const bsCollapse = new bootstrap.Collapse(navbarCollapse);
+        bsCollapse.hide();
+      }
+    });
+  });
+});
+</script>

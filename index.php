@@ -145,9 +145,9 @@ include(__DIR__ . "/includes/navbar.php");
     /* Music Control Button */
     .music-control {
       position: fixed;
-      top: 20px;
+      top: 105px;
       right: 20px;
-      z-index: 1000;
+      z-index: 1050;
       background: rgba(255,255,255,0.2);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255,255,255,0.3);
@@ -482,7 +482,7 @@ include(__DIR__ . "/includes/navbar.php");
       }
 
       .music-control {
-        top: 15px;
+        top: 90px;
         right: 15px;
         width: 45px;
         height: 45px;
@@ -782,7 +782,7 @@ include(__DIR__ . "/includes/navbar.php");
 
 <script>
 (function(){
-  // Zodiac wheel animation (unchanged)
+  // Zodiac wheel animation
   const wheel = document.querySelector('.wheel');
   if (!wheel) return;
 
