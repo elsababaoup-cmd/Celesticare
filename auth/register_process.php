@@ -23,6 +23,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
     $email = mysqli_real_escape_string($conn, trim($_POST['email']));
     
+    // ✅ CRITICAL: Save pre-login session data BEFORE registration
+    $pre_login_data = [
+        'name' => $_SESSION['name'] ?? null,
+        'birthdate' => $_SESSION['birthdate'] ?? null,
+        'gender' => $_SESSION['gender'] ?? null,
+        'zodiac_sign' => $_SESSION['zodiac_sign'] ?? null,
+        'undertone' => $_SESSION['undertone'] ?? null
+    ];
+    
     // Check if it's an admin email registration attempt
     $is_admin_email = (strpos($email, ADMIN_EMAIL_DOMAIN) !== false);
     
@@ -100,16 +109,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 } else {
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                     $is_admin_value = $is_admin_email ? 1 : 0;
-                    $query = "INSERT INTO users (username, email, password, is_admin) VALUES ('$username', '$email', '$hashed_password', '$is_admin_value')";
+                    
+                    // ✅ MODIFIED: Insert user WITH pre-login quiz data
+                    $query = "INSERT INTO users (username, email, password, is_admin, name, birthdate, gender, zodiac_sign, undertone) 
+                             VALUES ('$username', '$email', '$hashed_password', '$is_admin_value', 
+                                    '" . mysqli_real_escape_string($conn, $pre_login_data['name']) . "', 
+                                    '" . mysqli_real_escape_string($conn, $pre_login_data['birthdate']) . "', 
+                                    '" . mysqli_real_escape_string($conn, $pre_login_data['gender']) . "', 
+                                    '" . mysqli_real_escape_string($conn, $pre_login_data['zodiac_sign']) . "', 
+                                    '" . mysqli_real_escape_string($conn, $pre_login_data['undertone']) . "')";
                     
                     if (mysqli_query($conn, $query)) {
                         // Get the new user ID
                         $user_id = mysqli_insert_id($conn);
                         
+                        // ✅ CRITICAL: Regenerate session ID for security
+                        session_regenerate_id(true);
+                        
                         // Start session for the new user
                         $_SESSION['user_id'] = $user_id;
                         $_SESSION['username'] = $username;
                         $_SESSION['is_admin'] = $is_admin_email;
+                        
+                        // ✅ CRITICAL: Keep pre-login data in the new session
+                        foreach ($pre_login_data as $key => $value) {
+                            if ($value) $_SESSION[$key] = $value;
+                        }
                         
                         if ($is_admin_email) {
                             $_SESSION['admin_email'] = $email;
