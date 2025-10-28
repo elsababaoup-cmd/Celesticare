@@ -518,6 +518,67 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
     border: 2px solid rgba(255,255,255,0.3);
 }
 
+/* Enhanced Color Section Centering */
+.color-section {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.color-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.color-visual {
+    margin: 15px 0;
+}
+
+.color-palette {
+    margin: 15px 0;
+}
+
+.color-empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ensure consistent button alignment */
+.color-section .btn-style {
+    margin-top: auto;
+    margin-bottom: 10px;
+}
+
+/* Mobile responsiveness for color section */
+@media (max-width: 768px) {
+    .color-section {
+        min-height: 320px;
+    }
+    
+    .color-wheel {
+        max-width: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .color-wheel {
+        max-width: 150px;
+    }
+    
+    .color-swatch {
+        width: 25px;
+        height: 25px;
+        margin: 0 3px;
+    }
+}
+
 .aesthetic-badge {
     display: inline-block;
     padding: 0.4rem 1rem;
@@ -815,50 +876,50 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
                 </div>
             </div>
 
-            <!-- 🎨 Color Analysis - SIMPLE VERSION -->
-            <div class="color-section">
+            <!-- 🎨 Color Analysis - CENTERED VERSION -->
+            <div class="color-section text-center">
                 <div class="section-title mb-3">Color Analysis</div>
                 
-                <div class="mb-3">
-                    <p class="mb-1"><strong>Zodiac:</strong> <?= $zodiac ?></p>
-                    <p class="mb-1"><strong>Undertone:</strong> <?= $undertone ?></p>
-                    <p class="mb-1"><strong>Season:</strong> <?= $season ?></p>
-                </div>
-                
                 <?php if ($undertone && $undertone !== 'Not set'): ?>
-                    <div class="text-center mb-3">
-                        <?php
-                        $undertone_lower = strtolower($undertone);
-                        $image_path = $base_path . $undertone_lower . "_wheel.png";
-                        ?>
-                        <img src="<?= $image_path ?>" 
-                            alt="<?= $undertone ?> color wheel" 
-                            class="color-wheel">
-                    </div>
-                    
-                    <div class="text-center mb-3">
-                        <?php
-                        $palettes = [
-                            "Warm" => ["#E69A5B", "#F5C16C", "#D76A03", "#C25B02", "#FFD27F"],
-                            "Cool" => ["#5B7BE6", "#A3C1F7", "#7089E3", "#4059C2", "#9EB8FF"],
-                            "Neutral" => ["#D7BFAE", "#C1B3A4", "#A8988B", "#8B7C6F", "#BFA98B"]
-                        ];
+                    <div class="color-content">
+                        <div class="mb-3">
+                            <p class="mb-1"><strong>Zodiac:</strong> <?= $zodiac ?></p>
+                            <p class="mb-1"><strong>Undertone:</strong> <?= $undertone ?></p>
+                            <p class="mb-1"><strong>Season:</strong> <?= $season ?></p>
+                        </div>
                         
-                        if (isset($palettes[$undertone])) {
-                            foreach ($palettes[$undertone] as $color) {
-                                echo '<div class="color-swatch d-inline-block" style="background: ' . $color . '"></div>';
+                        <div class="color-visual mb-3">
+                            <?php
+                            $undertone_lower = strtolower($undertone);
+                            $image_path = $base_path . $undertone_lower . "_wheel.png";
+                            ?>
+                            <img src="<?= $image_path ?>" 
+                                alt="<?= $undertone ?> color wheel" 
+                                class="color-wheel">
+                        </div>
+                        
+                        <div class="color-palette mb-3">
+                            <?php
+                            $palettes = [
+                                "Warm" => ["#E69A5B", "#F5C16C", "#D76A03", "#C25B02", "#FFD27F"],
+                                "Cool" => ["#5B7BE6", "#A3C1F7", "#7089E3", "#4059C2", "#9EB8FF"],
+                                "Neutral" => ["#D7BFAE", "#C1B3A4", "#A8988B", "#8B7C6F", "#BFA98B"]
+                            ];
+                            
+                            if (isset($palettes[$undertone])) {
+                                foreach ($palettes[$undertone] as $color) {
+                                    echo '<div class="color-swatch d-inline-block" style="background: ' . $color . '"></div>';
+                                }
                             }
-                        }
-                        ?>
-                    </div>
-                    
-                    <div class="text-center">
+                            ?>
+                        </div>
+                        
                         <a href="../undertone/undertone_result.php" class="btn-style">View Full Analysis</a>
                     </div>
                 <?php else: ?>
-                    <div class="text-center py-3">
+                    <div class="color-empty-state py-4">
                         <p class="text-muted mb-3">Complete color analysis to see your personal color palette</p>
-                        <a href="../setup/get_to_know.php" class="btn-style">I want to know!</a>
+                        <a href="../setup/get_to_know.php" class="btn-style">Lets Go!</a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -886,11 +947,11 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
                     
                 <?php else : ?>
                     <p>Want to know your Aesthetic?</p>
-                    <a href="../quizzes/aesthetic_welcome.php" class="btn-style">I want to know!</a>
+                    <a href="../quizzes/aesthetic_welcome.php" class="btn-style">Lets Go!</a>
                 <?php endif; ?>
             </div>
 
-            <!-- 👗 Style Section - ENHANCED VERSION -->
+            <!-- 👗 Style Section - MATCHING AESTHETIC FORMAT -->
             <div class="outfit-section text-center">
                 <div class="section-title mb-2">Your Style</div>
                 <?php if (!empty($style_result)) : ?>
@@ -977,13 +1038,11 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
                     <a href="../quizzes/style_result.php" class="btn-style">View Full Analysis</a>
                     
                 <?php else : ?>
-                    <div class="py-4">
-                        <p class="mb-3">Discover your personal style through our style quiz!</p>
-                        <a href="../quizzes/style_welcome.php" class="btn-style">Find My Style</a>
-                    </div>
+                    <!-- EXACT COPY OF AESTHETIC UNFINISHED FORMAT -->
+                    <p>Want to know your Style?</p>
+                    <a href="../quizzes/style_welcome.php" class="btn-style">Lets Go!</a>
                 <?php endif; ?>
             </div>
-
             <!-- 🎨 Moodboard Section - SUBTLE VERSION -->
             <div class="moodboard-section">
                 <?php 
