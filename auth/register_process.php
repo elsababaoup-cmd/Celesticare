@@ -1,68 +1,136 @@
 <?php
-include("../config/dbconfig.php");
 session_start();
+include("../config/dbconfig.php");
+
+// ✅ Allowed email domains
+$allowed_domains = [
+    'gmail.com',
+    'yahoo.com', 
+    'yahoo.co.uk',
+    'yahoo.ca',
+    'hotmail.com',
+    'hotmail.co.uk',
+    'outlook.com',
+    'outlook.fr',
+    'outlook.de'
+];
+
+// ✅ ADMIN CONFIGURATION
+define('ADMIN_EMAIL_DOMAIN', '@celesticare.admin.com');
+define('ADMIN_SECRET_KEY', 'CelestiCare2025!');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
     $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
-        echo "<script>alert('All fields are required.'); window.history.back();</script>";
-        exit();
+    
+    // Check if it's an admin email registration attempt
+    $is_admin_email = (strpos($email, ADMIN_EMAIL_DOMAIN) !== false);
+    
+    if ($is_admin_email) {
+        // Admin registration - use admin password fields
+        $password = $_POST['admin_password'] ?? '';
+        $confirm_password = $_POST['confirm_admin_password'] ?? '';
+    } else {
+        // Regular registration - use regular password fields
+        $password = $_POST['password'] ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
     }
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "<script>alert('Invalid email format.'); window.history.back();</script>";
+    if (empty($username) || empty($email)) {
+        echo "error:Username and email are required.";
         exit();
-    }
-
-    if ($password !== $confirm_password) {
-        echo "<script>alert('Passwords do not match.'); window.history.back();</script>";
-        exit();
-    }
-
-    // ✅ Check if email already exists
-    $check_query = "SELECT id FROM users WHERE email = ? LIMIT 1";
-    $stmt = mysqli_prepare($conn, $check_query);
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    if (mysqli_num_rows($result) > 0) {
-        echo "<script>alert('This email is already registered.'); window.history.back();</script>";
-        exit();
-    }
-
-    // ✅ Get any existing data from session (from get_to_know.php or zodiac result)
-    $name = $_SESSION['name'] ?? null;
-    $birthdate = $_SESSION['birthdate'] ?? null;
-    $gender = $_SESSION['gender'] ?? null;
-    $zodiac_sign = $_SESSION['zodiac_sign'] ?? null;
-    $undertone = $_SESSION['undertone'] ?? null;
-    $season = $_SESSION['season'] ?? null;
-
-    // ✅ Insert new user with optional fields
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $query = "INSERT INTO users (username, email, password, name, birthdate, gender, zodiac_sign, undertone, season)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = mysqli_prepare($conn, $query);
-    mysqli_stmt_bind_param($stmt, "sssssssss", $username, $email, $hashed_password, $name, $birthdate, $gender, $zodiac_sign, $undertone, $season);
-
-    if (mysqli_stmt_execute($stmt)) {
-        // ✅ Get user ID and save to session for auto-login
-        $user_id = mysqli_insert_id($conn);
-        $_SESSION['user_id'] = $user_id;
-
-        echo "<script>
-            alert('Registration successful! Your details have been saved.');
-            window.location.href='../dashboard/index.php';
-        </script>";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "error:Invalid email format.";
         exit();
     } else {
-        echo "<script>alert('Database error. Please try again later.'); window.history.back();</script>";
-        exit();
+        if ($is_admin_email) {
+            // ✅ Admin email registration - require admin passwords
+            if (empty($password) || empty($confirm_password)) {
+                echo "error:Admin password fields are required.";
+                exit();
+            } elseif ($password !== $confirm_password) {
+                echo "error:Admin passwords do not match!";
+                exit();
+            } elseif ($password !== ADMIN_SECRET_KEY) {
+                echo "error:Invalid admin password for admin email registration.";
+                exit();
+            } else {
+                // Admin email validation passed
+                $valid_admin_email = true;
+            }
+        } else {
+            // ✅ Regular user email - check if domain is allowed
+            $email_domain = strtolower(substr(strrchr($email, "@"), 1));
+            if (!in_array($email_domain, $allowed_domains)) {
+                echo "error:Only Gmail, Yahoo, Hotmail, and Outlook emails are allowed.";
+                exit();
+            } else {
+                $valid_regular_email = true;
+            }
+        }
+
+        // If email validation passed, continue with password checks
+        if (isset($valid_admin_email) || isset($valid_regular_email)) {
+            if ($password !== $confirm_password) {
+                echo "error:Passwords do not match!";
+                exit();
+            } else {
+                // Validate password: no spaces, minimum 8 characters, at least one uppercase letter
+                // For admin, skip regular password validation since they use the admin secret key
+                if (!$is_admin_email) {
+                    if (strpos($password, ' ') !== false) {
+                        echo "error:Password cannot contain spaces.";
+                        exit();
+                    } elseif (strlen($password) < 8) {
+                        echo "error:Password must be at least 8 characters long.";
+                        exit();
+                    } elseif (!preg_match('/[A-Z]/', $password)) {
+                        echo "error:Password must contain at least one uppercase letter.";
+                        exit();
+                    }
+                }
+                
+                // If no password errors, proceed
+                $check_query = "SELECT id FROM users WHERE email='$email' LIMIT 1";
+                $check_result = mysqli_query($conn, $check_query);
+
+                if (mysqli_num_rows($check_result) > 0) {
+                    echo "error:This email is already registered.";
+                    exit();
+                } else {
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                    $is_admin_value = $is_admin_email ? 1 : 0;
+                    $query = "INSERT INTO users (username, email, password, is_admin) VALUES ('$username', '$email', '$hashed_password', '$is_admin_value')";
+                    
+                    if (mysqli_query($conn, $query)) {
+                        // Get the new user ID
+                        $user_id = mysqli_insert_id($conn);
+                        
+                        // Start session for the new user
+                        $_SESSION['user_id'] = $user_id;
+                        $_SESSION['username'] = $username;
+                        $_SESSION['is_admin'] = $is_admin_email;
+                        
+                        if ($is_admin_email) {
+                            $_SESSION['admin_email'] = $email;
+                            $_SESSION['admin_logged_in'] = true;
+                            $_SESSION['admin_id'] = $user_id;
+                        }
+                        
+                        // AJAX response - same format as regular register
+                        if ($is_admin_email) {
+                            echo "success:../admin/manage_users.php";
+                        } else {
+                            echo "success:../dashboard/index.php";
+                        }
+                    } else {
+                        echo "error:Database error. Please try again.";
+                    }
+                }
+            }
+        }
     }
+} else {
+    echo "error:Invalid request method.";
 }
 ?>

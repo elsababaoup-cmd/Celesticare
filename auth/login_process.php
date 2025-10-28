@@ -1,96 +1,96 @@
 <?php
-include("../config/dbconfig.php");
 session_start();
+include("../config/dbconfig.php");
+
+// ✅ Allowed email domains for regular users
+$allowed_domains = [
+    'gmail.com',
+    'yahoo.com', 
+    'yahoo.co.uk',
+    'yahoo.ca',
+    'hotmail.com',
+    'hotmail.co.uk',
+    'outlook.com',
+    'outlook.fr',
+    'outlook.de'
+];
+
+// ✅ ADMIN CONFIGURATION
+define('ADMIN_EMAIL_DOMAIN', '@celesticare.admin.com');
+define('ADMIN_SECRET_KEY', 'CelestiCare2025!');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
     if (empty($email) || empty($password)) {
-        echo "<script>alert('Both fields are required.'); window.history.back();</script>";
+        echo "error:Both fields are required.";
         exit();
     }
 
-    $query = "SELECT * FROM users WHERE email = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($user = $result->fetch_assoc()) {
-        if (password_verify($password, $user['password'])) {
-
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['email'] = $user['email'];
-
-            // ✅ CRITICAL FIX: Check if we have NEW session data from "Get to Know You"
-            $hasNewSessionData = !empty($_SESSION['zodiac_sign']) || !empty($_SESSION['name']) || !empty($_SESSION['birthdate']);
-
-            if ($hasNewSessionData) {
-                // ✅ USER HAS NEW DATA: Update database with session data
-                $name = $_SESSION['name'] ?? $user['name'];
-                $birthdate = $_SESSION['birthdate'] ?? $user['birthdate'];
-                $gender = $_SESSION['gender'] ?? $user['gender'];
-                $zodiac_sign = $_SESSION['zodiac_sign'] ?? $user['zodiac_sign'];
-                $undertone = $_SESSION['undertone'] ?? $user['undertone'];
-                $season = $_SESSION['season'] ?? $user['season'];
-
-                $update = $conn->prepare("UPDATE users SET name=?, birthdate=?, gender=?, zodiac_sign=?, undertone=?, season=? WHERE id=?");
-                $update->bind_param("ssssssi", $name, $birthdate, $gender, $zodiac_sign, $undertone, $season, $user['id']);
-                $update->execute();
-
-                // ✅ Keep the NEW session data (don't overwrite with old DB data)
-                // Session already has the new data, so we don't need to change it
-
-            } else {
-                // ✅ USER HAS NO NEW DATA: Restore from database
-                if (!empty($user['zodiac_sign'])) {
-                    $_SESSION['zodiac_sign'] = $user['zodiac_sign'];
-                    setcookie('zodiac_sign', $user['zodiac_sign'], time() + (86400 * 30), "/");
-                }
-                
-                if (!empty($user['undertone'])) {
-                    $_SESSION['undertone'] = $user['undertone'];
-                    setcookie('undertone', $user['undertone'], time() + (86400 * 30), "/");
-                }
-                
-                if (!empty($user['season'])) {
-                    $_SESSION['season'] = $user['season'];
-                }
-
-                // Restore basic profile data
-                $_SESSION['name'] = $user['name'] ?? '';
-                $_SESSION['birthdate'] = $user['birthdate'] ?? '';
-                $_SESSION['gender'] = $user['gender'] ?? '';
-            }
-
-            // ✅ Sync color data if exists
-            echo "
-            <script>
-                const colorData = localStorage.getItem('colorAnalysisData');
-                if (colorData) {
-                    fetch('../user/save_color_data.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(JSON.parse(colorData))
-                    }).then(() => {
-                        localStorage.removeItem('colorAnalysisData');
-                        window.location.href = '../dashboard/index.php';
-                    });
-                } else {
-                    window.location.href = '../dashboard/index.php';
-                }
-            </script>";
-            exit();
-
-        } else {
-            echo "<script>alert('Invalid password.'); window.history.back();</script>";
+    // ✅ Check if it's an admin login attempt
+    $is_admin_email = (strpos($email, ADMIN_EMAIL_DOMAIN) !== false);
+    
+    if (!$is_admin_email) {
+        // ✅ Validate email domain for regular users
+        $email_domain = strtolower(substr(strrchr($email, "@"), 1));
+        if (!in_array($email_domain, $allowed_domains)) {
+            echo "error:Only Gmail, Yahoo, Hotmail, and Outlook emails are allowed.";
             exit();
         }
+        
+        // Validate password for regular users
+        if (strpos($password, ' ') !== false) {
+            echo "error:Password cannot contain spaces.";
+            exit();
+        }
+        
+        // Regular user login
+        $query = "SELECT * FROM users WHERE email = ?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if ($user = mysqli_fetch_assoc($result)) {
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['is_admin'] = false;
+                
+                echo "success:../dashboard/index.php";
+            } else {
+                echo "error:Invalid password.";
+            }
+        } else {
+            echo "error:No account found with that email.";
+        }
     } else {
-        echo "<script>alert('No account found with that email.'); window.history.back();</script>";
-        exit();
+        // Admin login logic
+        if ($password === ADMIN_SECRET_KEY) {
+            $query = "SELECT * FROM users WHERE email = ? AND email LIKE '%" . ADMIN_EMAIL_DOMAIN . "'";
+            $stmt = mysqli_prepare($conn, $query);
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+
+            if ($user = mysqli_fetch_assoc($result)) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['is_admin'] = true;
+                $_SESSION['admin_email'] = $email;
+                $_SESSION['admin_logged_in'] = true;
+                $_SESSION['admin_id'] = $user['id'];
+                
+                echo "success:../admin/manage_users.php";
+            } else {
+                echo "error:Admin email not found in system.";
+            }
+        } else {
+            echo "error:Invalid admin credentials.";
+        }
     }
+} else {
+    echo "error:Invalid request method.";
 }
 ?>

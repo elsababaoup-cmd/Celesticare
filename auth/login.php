@@ -1,5 +1,4 @@
 <?php
-// Start output buffering at the VERY top
 ob_start();
 session_start();
 
@@ -9,7 +8,20 @@ $message = "";
 
 // ✅ ADMIN CONFIGURATION
 define('ADMIN_EMAIL_DOMAIN', '@celesticare.admin.com');
-define('ADMIN_SECRET_KEY', 'CelestiCare2025!'); // Change this to your secure admin password
+define('ADMIN_SECRET_KEY', 'CelestiCare2025!');
+
+// ✅ Allowed email domains for regular users
+$allowed_domains = [
+    'gmail.com',
+    'yahoo.com', 
+    'yahoo.co.uk',
+    'yahoo.ca',
+    'hotmail.com',
+    'hotmail.co.uk',
+    'outlook.com',
+    'outlook.fr',
+    'outlook.de'
+];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
@@ -21,10 +33,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // ✅ Check if it's an admin login attempt
         $is_admin_email = (strpos($email, ADMIN_EMAIL_DOMAIN) !== false);
         
-        if ($is_admin_email) {
-            // Admin login logic
+        // ✅ For regular users, validate email domain
+        if (!$is_admin_email) {
+            $email_domain = strtolower(substr(strrchr($email, "@"), 1));
+            if (!in_array($email_domain, $allowed_domains)) {
+                $message = "<div class='alert alert-danger text-center'>Only Gmail, Yahoo, Hotmail, and Outlook emails are allowed.</div>";
+            } elseif (strpos($password, ' ') !== false) {
+                $message = "<div class='alert alert-danger text-center'>Password cannot contain spaces.</div>";
+            } else {
+                // Regular user login logic
+                $query = "SELECT * FROM users WHERE email = ?";
+                $stmt = mysqli_prepare($conn, $query);
+                mysqli_stmt_bind_param($stmt, "s", $email);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+
+                if ($user = mysqli_fetch_assoc($result)) {
+                    if (password_verify($password, $user['password'])) {
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['username'] = $user['username'];
+                        $_SESSION['is_admin'] = false;
+                        
+                        ob_end_clean();
+                        header("Location: ../dashboard/index.php");
+                        exit();
+                    } else {
+                        $message = "<div class='alert alert-danger text-center'>Invalid password.</div>";
+                    }
+                } else {
+                    $message = "<div class='alert alert-danger text-center'>No account found with that email.</div>";
+                }
+            }
+        } else {
+            // Admin login logic (unchanged)
             if ($password === ADMIN_SECRET_KEY) {
-                // Verify admin email exists in database
                 $query = "SELECT * FROM users WHERE email = ? AND email LIKE '%" . ADMIN_EMAIL_DOMAIN . "'";
                 $stmt = mysqli_prepare($conn, $query);
                 mysqli_stmt_bind_param($stmt, "s", $email);
@@ -39,7 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['admin_logged_in'] = true;
                     $_SESSION['admin_id'] = $user['id'];
                     
-                    // Clear the buffer before redirect
                     ob_end_clean();
                     header("Location: ../admin/manage_users.php");
                     exit();
@@ -49,35 +90,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 $message = "<div class='alert alert-danger text-center'>Invalid admin credentials.</div>";
             }
-        } else {
-            // Regular user login logic (your existing code)
-            $query = "SELECT * FROM users WHERE email = ?";
-            $stmt = mysqli_prepare($conn, $query);
-            mysqli_stmt_bind_param($stmt, "s", $email);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-
-            if ($user = mysqli_fetch_assoc($result)) {
-                if (password_verify($password, $user['password'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['is_admin'] = false;
-                    
-                    // Clear the buffer before redirect
-                    ob_end_clean();
-                    header("Location: ../dashboard/index.php");
-                    exit();
-                } else {
-                    $message = "<div class='alert alert-danger text-center'>Invalid password.</div>";
-                }
-            } else {
-                $message = "<div class='alert alert-danger text-center'>No account found with that email.</div>";
-            }
         }
     }
 }
 
-// If we reach here, output the buffered content
 ob_end_flush();
 ?>
 <!DOCTYPE html>
@@ -86,6 +102,7 @@ ob_end_flush();
     <meta charset="UTF-8">
     <title>Login - CelestiCare</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         html, body {
             height: 100%;
@@ -139,6 +156,26 @@ ob_end_flush();
             color: #cfcfcf;
         }
 
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #cfcfcf;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .toggle-password:hover {
+            color: #ffffff;
+        }
+
         .btn-login {
             background-color: #6b5b95;
             color: #fff;
@@ -190,8 +227,11 @@ ob_end_flush();
             <div class="mb-3">
                 <input type="email" name="email" class="form-control" placeholder="Email" required>
             </div>
-            <div class="mb-3">
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            <div class="mb-3 password-container">
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+                <button type="button" class="toggle-password" id="togglePassword">
+                    <i class="far fa-eye"></i>
+                </button>
             </div>
             <button type="submit" class="btn btn-login">Login</button>
             <p class="text-center text-muted mt-3">
@@ -200,6 +240,24 @@ ob_end_flush();
         </form>
     </div>
 </div>
+
+<script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+</script>
 
 </body>
 </html>

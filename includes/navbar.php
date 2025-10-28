@@ -201,7 +201,7 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
           <li class="nav-item">
             <a class="nav-link" href="<?= $BASE ?>/dashboard/index.php">
               <img src="<?= $BASE ?>/assets/icons/dashboard.png" alt="Dashboard" class="nav-icon">
-              <span>Dashboard</span>
+              <span>User Dashboard</span>
             </a>
           </li>
           <li class="nav-item">
@@ -243,9 +243,9 @@ if (isset($_SESSION['user_id']) && empty($_SESSION['zodiac_sign'])) {
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="<?= $BASE ?>/auth/register.php">
+            <a class="nav-link" href="<?= $BASE ?>/auth/login.php">
               <i class="fas fa-user-plus nav-fa-icon"></i>
-              <span>Sign Up</span>
+              <span>Login</span>
             </a>
           </li>
         <?php endif; ?>

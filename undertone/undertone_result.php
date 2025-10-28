@@ -89,9 +89,9 @@ $palettes = [
         "neutral" => ["#110f0d","#4c3860","#662a48","#504840","#867a6e","#d6d5da"]
     ],
 
-    "Saggitarius" => [
+    "Sagittarius" => [
         "cool" => ["#40007b","#3830a0","#24879d","#7f1d80","#ce2c82","#ce6aac"],
-        "warm" => ["#52201c","#415715","#fa7e1e","#Fe7735aF9F1C","#aac265","#edba4a"],
+        "warm" => ["#52201c","#415715","#fa7e1e","#e7735a","#aac265","#edba4a"],
         "neutral" => ["#2c2956","#4d234b","#786988","#6d76a7","#5386a2","#7b98b7"]
     ],
 
@@ -248,6 +248,16 @@ h2 {
 .modal-header { 
     border-bottom: none; 
 }
+
+.admin-notice {
+    background: rgba(107, 91, 149, 0.3);
+    border: 1px solid #6b5b95;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    text-align: center;
+}
 .form-control { 
   background-color: #1f1f1f; color: #fff; border: none;
 }
@@ -358,6 +368,26 @@ body.modal-open {
   padding-right: 0 !important;
 }
 
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #cfcfcf;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.toggle-password:hover {
+    color: #ffffff;
+}
+
 html::-webkit-scrollbar,
 .modal::-webkit-scrollbar,
 body::-webkit-scrollbar {
@@ -412,7 +442,6 @@ body::-webkit-scrollbar {
       </button>
     <?php endif; ?>
 
-
 <!-- LOGIN MODAL -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -420,17 +449,22 @@ body::-webkit-scrollbar {
       <div class="brand-title">CELESTICARE</div>
       <h2>Log in to your CelestiCare profile</h2>
 
-      <form method="POST" action="../auth/login_process.php">
+      <form id="loginForm" method="POST" action="../auth/login_process.php">
+        <!-- Error message container -->
+        <div id="loginError"></div>
         <div class="mb-3">
           <input type="email" name="email" class="form-control" placeholder="Email" required>
         </div>
-        <div class="mb-3">
-          <input type="password" name="password" class="form-control" placeholder="Password" required>
+        <div class="mb-3 password-container">
+          <input type="password" name="password" id="loginPassword" class="form-control" placeholder="Password" required>
+          <button type="button" class="toggle-password" id="toggleLoginPassword">
+            <i class="far fa-eye"></i>
+          </button>
         </div>
         <button type="submit" class="btn btn-login">Login</button>
 
         <p class="text-center text-muted mt-3">
-          Don’t have a CelestiCare profile?
+          Don't have a CelestiCare profile?
           <a href="#" id="showRegister">Sign up</a>
         </p>
       </form>
@@ -445,19 +479,51 @@ body::-webkit-scrollbar {
       <div class="brand-title">CELESTICARE</div>
       <h2>Sign up to create your CelestiCare Profile!</h2>
 
-      <form method="POST" action="../auth/register_process.php">
+      <form id="registerForm" method="POST" action="../auth/register_process.php">
+        <!-- Error message container -->
+        <div id="registerError"></div>
         <div class="mb-3">
-          <input type="email" name="email" class="form-control" placeholder="Email" required>
+          <input type="email" name="email" id="registerEmail" class="form-control" placeholder="Email" required>
         </div>
         <div class="mb-3">
           <input type="text" name="username" class="form-control" placeholder="Username" required>
         </div>
-        <div class="mb-3">
-          <input type="password" name="password" class="form-control" placeholder="Password" required>
+        
+        <!-- Regular User Password Fields -->
+        <div id="regularPasswordFields">
+          <div class="mb-3 password-container">
+            <input type="password" name="password" id="registerPassword" class="form-control" placeholder="Password (min. 8 chars, 1 uppercase)" required>
+            <button type="button" class="toggle-password" id="toggleRegisterPassword">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
+          <div class="mb-3 password-container">
+            <input type="password" name="confirm_password" id="confirmPassword" class="form-control" placeholder="Confirm Password" required>
+            <button type="button" class="toggle-password" id="toggleConfirmPassword">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
         </div>
-        <div class="mb-3">
-          <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password" required>
+
+        <!-- Admin Password Fields (initially hidden) -->
+        <div id="adminPasswordFields" style="display: none;">
+          <div class="admin-notice">
+            <i class="fas fa-shield-alt me-2"></i>Admin Account Registration
+          </div>
+          <div class="mb-3 password-container">
+            <input type="password" name="admin_password" id="adminPassword" class="form-control" placeholder="Admin Password">
+            <button type="button" class="toggle-password" id="toggleAdminPassword">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
+          <div class="mb-3 password-container">
+            <input type="password" name="confirm_admin_password" id="confirmAdminPassword" class="form-control" placeholder="Confirm Admin Password">
+            <button type="button" class="toggle-password" id="toggleConfirmAdminPassword">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
         </div>
+        
         <button type="submit" class="btn btn-register">Continue</button>
 
         <p class="text-center text-muted mt-3">
@@ -468,135 +534,433 @@ body::-webkit-scrollbar {
   </div>
 </div>
 
-
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// Toggle Login/Register sections
-$("#showRegister").click(function(e){
-  e.preventDefault();
-  $("#loginSection").hide();
-  $("#registerSection").show();
-});
-$("#showLogin").click(function(e){
-  e.preventDefault();
-  $("#registerSection").hide();
-  $("#loginSection").show();
-});
-
-// Login process
-$("#loginForm").submit(function(e){
-  e.preventDefault();
-  $.post("../auth/login_process.php", $(this).serialize(), function(data){
-    if(data.status === "success"){
-      $("#message").html('<span class="text-success">'+data.message+'</span>');
-      setTimeout(()=>window.location.href="../dashboard/index.php", 1000);
+// Password visibility toggles
+function setupPasswordToggles() {
+    console.log('Setting up password toggles...'); // Debug log
+    
+    // Login password toggle
+    const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+    const loginPassword = document.getElementById('loginPassword');
+    
+    if (toggleLoginPassword && loginPassword) {
+        console.log('Found login password elements'); // Debug log
+        toggleLoginPassword.addEventListener('click', function() {
+            console.log('Login password toggle clicked'); // Debug log
+            const icon = this.querySelector('i');
+            if (loginPassword.type === 'password') {
+                loginPassword.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                loginPassword.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
     } else {
-      $("#message").html('<span class="text-danger">'+data.message+'</span>');
+        console.log('Login password elements not found'); // Debug log
     }
-  }, "json");
-});
 
-// Register process
-$("#registerForm").submit(function(e){
-  e.preventDefault();
-  $.post("../auth/register_process.php", $(this).serialize(), function(data){
-    if(data.status === "success"){
-      $("#registerMessage").html('<span class="text-success">'+data.message+'</span>');
-      setTimeout(()=>window.location.href="../dashboard/index.php", 1000);
-    } else {
-      $("#registerMessage").html('<span class="text-danger">'+data.message+'</span>');
+    // Register password toggle
+    const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+    const registerPassword = document.getElementById('registerPassword');
+    
+    if (toggleRegisterPassword && registerPassword) {
+        console.log('Found register password elements'); // Debug log
+        toggleRegisterPassword.addEventListener('click', function() {
+            console.log('Register password toggle clicked'); // Debug log
+            const icon = this.querySelector('i');
+            if (registerPassword.type === 'password') {
+                registerPassword.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                registerPassword.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
     }
-  }, "json");
-});
 
+    // Confirm password toggle
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    const confirmPassword = document.getElementById('confirmPassword');
+    
+    if (toggleConfirmPassword && confirmPassword) {
+        console.log('Found confirm password elements'); // Debug log
+        toggleConfirmPassword.addEventListener('click', function() {
+            console.log('Confirm password toggle clicked'); // Debug log
+            const icon = this.querySelector('i');
+            if (confirmPassword.type === 'password') {
+                confirmPassword.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                confirmPassword.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+}
+
+// ✅ DYNAMIC PASSWORD FIELD SWITCHING
+function setupPasswordFieldSwitching() {
+    const registerEmail = document.getElementById('registerEmail');
+    const regularPasswordFields = document.getElementById('regularPasswordFields');
+    const adminPasswordFields = document.getElementById('adminPasswordFields');
+    const adminPasswordInput = document.getElementById('adminPassword');
+    const confirmAdminPasswordInput = document.getElementById('confirmAdminPassword');
+    const regularPasswordInput = document.getElementById('registerPassword');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+
+    function updateRequiredFields(isAdmin) {
+        if (isAdmin) {
+            // Admin mode - make admin fields required, regular fields not required
+            adminPasswordInput.required = true;
+            confirmAdminPasswordInput.required = true;
+            regularPasswordInput.required = false;
+            confirmPasswordInput.required = false;
+        } else {
+            // Regular mode - make regular fields required, admin fields not required
+            regularPasswordInput.required = true;
+            confirmPasswordInput.required = true;
+            adminPasswordInput.required = false;
+            confirmAdminPasswordInput.required = false;
+        }
+    }
+
+    if (registerEmail && regularPasswordFields && adminPasswordFields) {
+        registerEmail.addEventListener('input', function() {
+            const email = this.value.toLowerCase();
+            // Show admin password fields and hide regular fields for admin emails
+            if (email.includes('@celesticare.admin.com')) {
+                regularPasswordFields.style.display = 'none';
+                adminPasswordFields.style.display = 'block';
+                updateRequiredFields(true);
+                
+                // Clear regular password fields
+                regularPasswordInput.value = '';
+                confirmPasswordInput.value = '';
+            } else {
+                regularPasswordFields.style.display = 'block';
+                adminPasswordFields.style.display = 'none';
+                updateRequiredFields(false);
+                
+                // Clear admin password fields
+                adminPasswordInput.value = '';
+                confirmAdminPasswordInput.value = '';
+            }
+        });
+
+        // Also check on page load in case of back navigation
+        if (registerEmail.value.includes('@celesticare.admin.com')) {
+            regularPasswordFields.style.display = 'none';
+            adminPasswordFields.style.display = 'block';
+            updateRequiredFields(true);
+        } else {
+            updateRequiredFields(false);
+        }
+    }
+
+    // Setup admin password toggles
+    const toggleAdminPassword = document.getElementById('toggleAdminPassword');
+    if (toggleAdminPassword && adminPasswordInput) {
+        toggleAdminPassword.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (adminPasswordInput.type === 'password') {
+                adminPasswordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                adminPasswordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    const toggleConfirmAdminPassword = document.getElementById('toggleConfirmAdminPassword');
+    if (toggleConfirmAdminPassword && confirmAdminPasswordInput) {
+        toggleConfirmAdminPassword.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (confirmAdminPasswordInput.type === 'password') {
+                confirmAdminPasswordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                confirmAdminPasswordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+}
+
+// Combined function to set up all password features
+function setupAllPasswordToggles() {
+    setupPasswordToggles();
+    setupPasswordFieldSwitching();
+}
+// Single DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
-  const showRegister = document.getElementById('showRegister');
-  const showLogin = document.getElementById('showLogin');
-  const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-  const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+    console.log('DOM fully loaded'); // Debug log
+    
+    // Initialize password toggles immediately
+    setupAllPasswordToggles();
+    
+    // Modal elements
+    const showRegister = document.getElementById('showRegister');
+    const showLogin = document.getElementById('showLogin');
+    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
 
-  if (showRegister) {
-    showRegister.addEventListener('click', function(e) {
-      e.preventDefault();
-      loginModal.hide();
-      setTimeout(() => registerModal.show(), 400);
-    });
-  }
+    // Switch from login to register modal
+    if (showRegister) {
+        showRegister.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginModal.hide();
+            setTimeout(() => {
+                registerModal.show();
+                // Re-initialize ALL password toggles after modal switch
+                setTimeout(setupAllPasswordToggles, 100);
+            }, 400);
+        });
+    }
 
-  if (showLogin) {
-    showLogin.addEventListener('click', function(e) {
-      e.preventDefault();
-      registerModal.hide();
-      setTimeout(() => loginModal.show(), 400);
+    // Switch from register to login modal
+    if (showLogin) {
+        showLogin.addEventListener('click', function(e) {
+            e.preventDefault();
+            registerModal.hide();
+            setTimeout(() => {
+                loginModal.show();
+                // Re-initialize ALL password toggles after modal switch
+                setTimeout(setupAllPasswordToggles, 100);
+            }, 400);
+        });
+    }
+
+    // Re-initialize password toggles when modals are opened
+    const loginModalElement = document.getElementById('loginModal');
+    const registerModalElement = document.getElementById('registerModal');
+
+    if (loginModalElement) {
+        loginModalElement.addEventListener('shown.bs.modal', function() {
+            console.log('Login modal shown'); // Debug log
+            setTimeout(setupAllPasswordToggles, 100);
+        });
+    }
+
+    if (registerModalElement) {
+        registerModalElement.addEventListener('shown.bs.modal', function() {
+            console.log('Register modal shown'); // Debug log
+            setTimeout(setupAllPasswordToggles, 100);
+        });
+    }
+
+    // Handle login form submission with AJAX
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(loginForm);
+            const loginError = document.getElementById('loginError');
+            
+            // Clear previous errors
+            loginError.innerHTML = '';
+            
+            // Show loading state
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Logging in...';
+            submitBtn.disabled = true;
+
+            fetch('../auth/login_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.startsWith('success:')) {
+                    // Success - redirect to dashboard
+                    const redirectUrl = data.split(':')[1];
+                    window.location.href = redirectUrl;
+                } else if (data.startsWith('error:')) {
+                    // Error - show message in modal
+                    const errorMessage = data.split(':')[1];
+                    loginError.innerHTML = '<div class="alert alert-danger text-center">' + errorMessage + '</div>';
+                } else {
+                    // Unknown response
+                    loginError.innerHTML = '<div class="alert alert-danger text-center">Login failed. Please try again.</div>';
+                }
+            })
+            .catch(error => {
+                loginError.innerHTML = '<div class="alert alert-danger text-center">Network error. Please try again.</div>';
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
+    // Handle register form submission with AJAX
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(registerForm);
+            const registerError = document.getElementById('registerError');
+            
+            // Clear previous errors
+            registerError.innerHTML = '';
+            
+            // Show loading state
+            const submitBtn = registerForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+
+            fetch('../auth/register_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.startsWith('success:')) {
+                    // Success - redirect to dashboard
+                    const redirectUrl = data.split(':')[1];
+                    window.location.href = redirectUrl;
+                } else if (data.startsWith('error:')) {
+                    // Error - show message in modal
+                    const errorMessage = data.split(':')[1];
+                    registerError.innerHTML = '<div class="alert alert-danger text-center">' + errorMessage + '</div>';
+                } else {
+                    // Unknown response
+                    registerError.innerHTML = '<div class="alert alert-danger text-center">Registration failed. Please try again.</div>';
+                }
+            })
+            .catch(error => {
+                registerError.innerHTML = '<div class="alert alert-danger text-center">Network error. Please try again.</div>';
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
+    // Handle URL parameters for auto-showing modals with errors
+    const urlParams = new URLSearchParams(window.location.search);
+    const modalType = urlParams.get('modal');
+    
+    // Check if there's an error message from login/register process
+    <?php if (isset($_SESSION['error'])): ?>
+        const errorMessage = "<?php echo htmlspecialchars($_SESSION['error']); ?>";
+        
+        if (errorMessage) {
+            // Show error in appropriate modal
+            if (modalType === 'login') {
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                const loginError = document.getElementById('loginError');
+                
+                // Add error message to login modal
+                loginError.innerHTML = '<div class="alert alert-danger text-center">' + errorMessage + '</div>';
+                loginModal.show();
+                
+            } else if (modalType === 'register') {
+                const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+                const registerError = document.getElementById('registerError');
+                
+                // Add error message to register modal
+                registerError.innerHTML = '<div class="alert alert-danger text-center">' + errorMessage + '</div>';
+                registerModal.show();
+            }
+            
+            // Clear the error session
+            <?php unset($_SESSION['error']); ?>
+        }
+    <?php endif; ?>
+    
+    // Clear errors when switching between modals
+    document.getElementById('showRegister')?.addEventListener('click', function() {
+        document.getElementById('loginError').innerHTML = '';
     });
-  }
+    
+    document.getElementById('showLogin')?.addEventListener('click', function() {
+        document.getElementById('registerError').innerHTML = '';
+    });
 });
 
 // WHEEL FUNCTIONALITY
 (function(){
-  const wheel = document.querySelector('.wheel');
-  if (!wheel) return;
+    const wheel = document.querySelector('.wheel');
+    if (!wheel) return;
 
-  const ROTATIONS_PER_SECOND = 0.2;
-  const degreesPerMs = (ROTATIONS_PER_SECOND * 360) / 1000;
+    const ROTATIONS_PER_SECOND = 0.2;
+    const degreesPerMs = (ROTATIONS_PER_SECOND * 360) / 1000;
 
-  let rafId = null;
-  let lastTime = 0;
-  let angle = 0;
-  let running = false;
+    let rafId = null;
+    let lastTime = 0;
+    let angle = 0;
+    let running = false;
 
-  // Spin animation frame
-  function step(now){
-    if (!running) { rafId = null; return; }
-    if (!lastTime) lastTime = now;
-    const delta = now - lastTime;
-    lastTime = now;
-    angle = (angle + delta * degreesPerMs) % 360;
-    wheel.style.transform = `rotate(${angle}deg)`;
-    rafId = requestAnimationFrame(step);
-  }
+    // Spin animation frame
+    function step(now){
+        if (!running) { rafId = null; return; }
+        if (!lastTime) lastTime = now;
+        const delta = now - lastTime;
+        lastTime = now;
+        angle = (angle + delta * degreesPerMs) % 360;
+        wheel.style.transform = `rotate(${angle}deg)`;
+        rafId = requestAnimationFrame(step);
+    }
 
-  // Start rotation
-  function start(){
-    if (running) return;
-    running = true;
-    lastTime = 0;
-    rafId = requestAnimationFrame(step);
-  }
+    // Start rotation
+    function start(){
+        if (running) return;
+        running = true;
+        lastTime = 0;
+        rafId = requestAnimationFrame(step);
+    }
 
-  // Stop rotation
-  function stop(){
-    if (!running) return;
-    running = false;
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = null;
-    lastTime = 0;
-    wheel.style.transform = `rotate(${angle}deg)`;
-  }
+    // Stop rotation
+    function stop(){
+        if (!running) return;
+        running = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+        lastTime = 0;
+        wheel.style.transform = `rotate(${angle}deg)`;
+    }
 
-  // Hover spin
-  wheel.addEventListener('mouseenter', start);
-  wheel.addEventListener('mouseleave', stop);
+    // Hover spin
+    wheel.addEventListener('mouseenter', start);
+    wheel.addEventListener('mouseleave', stop);
 
-  // Prevent dragging
-  wheel.addEventListener('dragstart', e => e.preventDefault());
+    // Prevent dragging
+    wheel.addEventListener('dragstart', e => e.preventDefault());
 
-  // Optional click-to-spin button
-  const spinButton = document.querySelector('#spinButton');
-  if (spinButton) {
-    spinButton.addEventListener('click', function(){
-      if (!running) {
-        start();
-        spinButton.textContent = "Stop Wheel";
-      } else {
-        stop();
-        spinButton.textContent = "Spin Wheel";
-      }
-    });
-  }
+    // Optional click-to-spin button
+    const spinButton = document.querySelector('#spinButton');
+    if (spinButton) {
+        spinButton.addEventListener('click', function(){
+            if (!running) {
+                start();
+                spinButton.textContent = "Stop Wheel";
+            } else {
+                stop();
+                spinButton.textContent = "Spin Wheel";
+            }
+        });
+    }
 })();
 
 // ✅ FIXED: Only save undertone data, not zodiac
@@ -605,20 +969,20 @@ const undertone = "<?= htmlspecialchars($undertone) ?>";
 const season = "<?= htmlspecialchars($season ?? '') ?>";
 
 if (undertone) {
-  fetch("../user/save_color_data.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      undertone: undertone,
-      season: season
-      // ✅ REMOVED zodiac from the payload to prevent overwriting
+    fetch("../user/save_color_data.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            undertone: undertone,
+            season: season
+            // ✅ REMOVED zodiac from the payload to prevent overwriting
+        })
     })
-  })
-  .then(res => res.json())
-  .then(data => {
-    console.log("✅ Save undertone response:", data);
-  })
-  .catch(err => console.error("❌ Error saving undertone data:", err));
+    .then(res => res.json())
+    .then(data => {
+        console.log("✅ Save undertone response:", data);
+    })
+    .catch(err => console.error("❌ Error saving undertone data:", err));
 }
 <?php endif; ?>
 </script>

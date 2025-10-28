@@ -34,8 +34,8 @@ if (isset($_GET['delete_id'])) {
     exit();
 }
 
-// Fetch all users
-$result = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
+// Fetch all users ordered by registration date (oldest first)
+$result = mysqli_query($conn, "SELECT * FROM users ORDER BY created_at ASC");
 ?>
 
 <!DOCTYPE html>
@@ -285,6 +285,15 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
             color: #2e2e2e; /* Ensure button text is black where appropriate */
         }
 
+        /* User number styling */
+        .user-number {
+            font-weight: 600;
+            color: #4b3f77;
+            background: rgba(75, 63, 119, 0.1);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -415,7 +424,7 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
                     <table class="table table-striped table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>User #</th>
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>User Type</th>
@@ -424,9 +433,14 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
                             </tr>
                         </thead>
                         <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                        <?php 
+                        $user_number = 1;
+                        while ($row = mysqli_fetch_assoc($result)): 
+                        ?>
                             <tr>
-                                <td><?= $row['id']; ?></td>
+                                <td>
+                                    <span class="user-number">#<?= $user_number; ?></span>
+                                </td>
                                 <td>
                                     <strong><?= htmlspecialchars($row['username']); ?></strong>
                                     <?php if ($row['id'] == $_SESSION['admin_id']): ?>
@@ -473,7 +487,10 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
                                     <?php endif; ?>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php 
+                        $user_number++;
+                        endwhile; 
+                        ?>
                         </tbody>
                     </table>
                 </div>

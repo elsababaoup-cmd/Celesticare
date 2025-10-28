@@ -740,7 +740,7 @@ body::-webkit-scrollbar { width: 0 !important; height: 0 !important; background:
 <div class="container mt-5 mb-5">
     <div class="card p-4 shadow-sm">
         <h2>The Universe Welcomes your presence, <?php echo $username; ?>!</h2>
-        <p>This is your dashboard where your zodiac style journey begins.</p>
+        <p>This is your profile dashboard where your zodiac style journey begins.</p>
 
         <div class="grid-container mt-4">
             <!-- Enhanced Profile Section - FIXED VERSION -->
